@@ -1,0 +1,28 @@
+{% extends "base.jinja2" %}
+{% block title %}Cookbook{% endblock %}
+{% block header %}Cookbook{% endblock %}
+{% block content %}
+    <div id="logo-big-container">
+        <img id="logo-big" src="/static/logo.svg" alt="Cookbook">
+    </div>
+    <div id="search">
+        <form id="search-form" action="/search">
+            <input id="search-bar" type="search" name="query" placeholder="Recipe name, tags, ...">
+            <input type="submit" value="&#x1F50D;" hidden>
+        </form>
+    </div>
+    <div id="nav">
+        <a href="/all">Show All</a>
+        {% if langs %} |
+            {% for lang in langs %}
+                {% if lang == active_lang %}
+                    {{ lang }}
+                {% else %}
+                    <a href="/?lang={{ lang }}>">{{ lang }}</a>
+                {% endif %}
+
+                {% if loop.index0 != 0 %} &#9679; {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}

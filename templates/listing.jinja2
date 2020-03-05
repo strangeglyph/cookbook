@@ -1,0 +1,17 @@
+{% extends "base.jinja2" %}
+{% block title %}Cookbook{% endblock %}
+{% block header %}Cookbook{% endblock %}
+{% block content %}
+    <div id="logo-small-container">
+        <a href="/"><img id="logo-small" src="/static/logo.svg" alt="Cookbook"></a>
+    </div>
+    <div id="search">
+        <form id="search-form" action="/search">
+            <input id="search-bar" type="search" name="query" placeholder="Recipe name, tags, ...">
+            <input type="submit" value="&#x1F50D;" hidden>
+        </form>
+    </div>
+    <div id="nav">
+        <a href="/all">Show All</a> {% if langs %} | {{ langs|join(" &#9679; ") }} {% endif %}
+    </div>
+{% endblock %}

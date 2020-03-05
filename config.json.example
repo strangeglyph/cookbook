@@ -1,0 +1,5 @@
+{
+  "DEBUG": false,
+  "COOKBOOK_LOCATION": "/path/to/recipes",
+  "SECRET_KEY": put something here
+}
