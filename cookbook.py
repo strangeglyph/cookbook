@@ -49,6 +49,7 @@ class RecipeStep:
             else:
                 self.yields = [yields]
 
+
 class Recipe:
     def __init__(self, id: str, lang: str, name: str, serves: int,
                  note: str = None,
@@ -68,7 +69,7 @@ class Recipe:
             if type(tags) == str:
                 tags = tags.split()
             for tag in tags:
-                self.tags.append(tag.lower().strip())
+                self.tags.append(tag.lower().strip().strip(','))
 
         self.prep: List[RecipeStep] = []
         if prep is not None:

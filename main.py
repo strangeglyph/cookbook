@@ -23,7 +23,11 @@ def lang():
 
 @app.route('/')
 def index():
-    resp = flask.render_template('index.jinja2', langs=book.by_language.keys())
+    if request.args.get("lang") in book.by_language:
+        resp = flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=request.args.get("lang"))
+    else:
+        resp = flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=lang())
+
     if request.cookies.get("lang") not in book.by_language:
         resp.set_cookie("lang", app.config["defaultlang"])
     if request.args.get("lang") in book.by_language:
@@ -51,12 +55,14 @@ def search():
     for recipe in results:
         print(f"{recipe.name} [{recipe.lang}]")
 
-    if not results:
-        flask.flash("No result found :(")
-        flask.redirect('/')
-
-    resp = flask.make_response(flask.render_template('listing.jinja2', langs=book.by_language.keys(), active_lang=lang()))
+    resp = flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang()))
     return resp
+
+
+@app.route("/all")
+def all():
+    results = book.by_language[lang()]
+    return flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang()))
 
 
 if __name__ == "__main__":
