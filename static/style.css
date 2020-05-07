@@ -82,18 +82,19 @@ body {
 
 #results {
     display: grid;
-    width: 53em;
+    width: 67em;
     grid-template-areas: "a a";
     grid-gap: 1em;
 }
 
 .result {
-    width: 26em;
+    width: 33em;
     border: 1px solid gray;
     display: grid;
     grid-template-rows: [top] 1em auto 1em 1px [bottom];
     grid-template-columns: [left] 150px [text] auto [text-end] 0.5em;
     grid-gap: 0.5em 1em;
+    font-size: 11pt;
 }
 
 .result-image {
