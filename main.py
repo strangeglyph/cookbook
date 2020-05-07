@@ -13,10 +13,8 @@ book = Cookbook()
 
 def lang():
     if request and request.cookies and "lang" in request.cookies:
-        if request.cookies[lang] in book.by_language:
+        if request.cookies["lang"] in book.by_language:
             return request.cookies.get("lang")
-        else:
-            request.cookies["lang"] = app.config["defaultlang"]
 
     return app.config["defaultlang"]
 
@@ -24,14 +22,17 @@ def lang():
 @app.route('/')
 def index():
     if request.args.get("lang") in book.by_language:
-        resp = flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=request.args.get("lang"))
+        resp = flask.make_response(flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=request.args.get("lang")))
     else:
-        resp = flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=lang())
+        resp = flask.make_response(flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=lang()))
 
+    # Fix broken cookies
     if request.cookies.get("lang") not in book.by_language:
         resp.set_cookie("lang", app.config["defaultlang"])
+
+    # If a new language got specified, update cookies
     if request.args.get("lang") in book.by_language:
-        resp.set_cookie("lang", app.config["defaultlang"])
+        resp.set_cookie("lang", request.args.get("lang"))
     return resp
 
 
