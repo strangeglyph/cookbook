@@ -121,6 +121,14 @@ body {
     font-style: italic;
 }
 
+a.result-tag {
+    color: #6f6f7f;
+}
+
+a:visited.result-tag {
+    color: #6f6f7f;
+}
+
 #nav {
     margin-top: 1em;
 }

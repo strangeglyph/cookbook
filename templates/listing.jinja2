@@ -23,7 +23,12 @@
                     <img class="result-image" src="/static/no-image.png">
                     <span class="result-name">{{ recipe.name }}</span>
                     <span class="result-description">{% if recipe.note %}{{ recipe.note }}{% endif %}</span>
-                    <span class="result-tags">{{ recipe.tags|join(", ") }}</span>
+                    <span class="result-tags">
+                    {% for tag in recipe.tags %}
+                        {% if loop.index0 != 0 %}, {% endif %}
+                        <a class="result-tag" href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
+                    {% endfor %}
+                    </span>
                 </div>
             {% endfor %}
         {% endif %}
