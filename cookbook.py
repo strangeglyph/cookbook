@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Set
 import os.path as ospath
 from ruamel.yaml import YAML, yaml_object
 
@@ -70,19 +70,36 @@ class Recipe:
         self.name: str = name
         self.serves: int = serves
         self.note: Optional[str] = note
+        self.word_bag: Set[str] = set()
+
+        for word in name.split():
+            self.word_bag.add(word.lower())
+        if note:
+            for word in note.split():
+                self.word_bag.add(word.lower())
+
+
+        self.total_ingredients: List[Ingredient] = []
+        self.ingr_bag: Set[str] = set()
 
         self.tags: List[str] = []
+        self.tags_bag: Set[str] = set()
         if tags is not None:
             if type(tags) == str:
                 tags = tags.split(',')
             for tag in tags:
-                self.tags.append(tag.lower().strip().strip(','))
+                norm_tag = tag.lower().strip().strip(',')
+                self.tags.append(norm_tag)
+                self.tags_bag.add(norm_tag)
 
         self.prep: List[RecipeStep] = []
         if prep is not None:
             for i, step in enumerate(prep):
                 try:
-                    self.prep.append(RecipeStep(**step))
+                    rstep = RecipeStep(**step)
+                    self.prep.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
                 except TypeError as e:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
@@ -100,7 +117,10 @@ class Recipe:
         if mis_en_place is not None:
             for i, step in enumerate(mis_en_place):
                 try:
-                    self.mis_en_place.append(RecipeStep(**step))
+                    rstep = RecipeStep(**step)
+                    self.mis_en_place.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
                 except TypeError as e:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
@@ -118,7 +138,10 @@ class Recipe:
         if cooking is not None:
             for i, step in enumerate(cooking):
                 try:
-                    self.cooking.append(RecipeStep(**step))
+                    rstep = RecipeStep(**step)
+                    self.cooking.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
                 except TypeError as e:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
@@ -136,7 +159,10 @@ class Recipe:
         if passive_cooking is not None:
             for i, step in enumerate(passive_cooking):
                 try:
-                    self.passive_cooking.append(RecipeStep(**step))
+                    rstep = RecipeStep(**step)
+                    self.passive_cooking.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
                 except TypeError as e:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
@@ -149,6 +175,27 @@ class Recipe:
                 except LoadException as e:
                     e.args = (f"Recipe {id}.{lang}: passive step {i}: {e.args[0]}",)
                     raise e
+
+    def merge_ingredient(self, new_ingr: Ingredient):
+        found = False
+        for old_ingr in self.total_ingredients:
+            if old_ingr.ingredient == new_ingr.ingredient:
+                if old_ingr.unit == new_ingr.unit:
+                    old_ingr.amount += new_ingr.amount
+                    found = True
+                # TODO unit conversion
+        if not found:
+            self.ingr_bag.add(new_ingr.ingredient.lower())
+            self.total_ingredients.append(Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
+
+    def has_ingredient(self, wanted_ingr: str) -> bool:
+        return wanted_ingr.lower() in self.ingr_bag
+
+    def has_tag(self, wanted_tag: str) -> bool:
+        return wanted_tag.lower() in self.tags_bag
+
+    def has_word(self, wanted_word: str) -> bool:
+        return wanted_word.lower() in self.word_bag
 
     @staticmethod
     def split_path(path: str) -> (str, str):
