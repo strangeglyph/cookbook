@@ -2,6 +2,7 @@ import flask
 from flask import Flask, request
 import os
 
+import searchparser
 from cookbook import Cookbook
 
 app = Flask(__name__)
@@ -39,20 +40,17 @@ def index():
 
 @app.route('/search')
 def search():
-    query = request.args["query"]
-    if not query:
+    query_str = request.args["query"]
+    if not query_str:
         return flask.redirect('/')
-    norm_query = query.lower()
-    words = norm_query.split()
+
+    query = searchparser.Parser(query_str).parse()
+    print(query)
 
     results = set()
-    for recipe_trans in book.by_id.values():
-        for recipe in recipe_trans.translations.values():
-            for tag in recipe.tags:
-                if tag in words:
-                    results.add(recipe)
-            if norm_query in recipe.name:
-                results.add(recipe)
+    for recipe in book.by_language[lang()]:
+        if query.passes(recipe):
+            results.add(recipe)
 
     results = sorted(results, key=lambda r: r.name)
     for recipe in results:
