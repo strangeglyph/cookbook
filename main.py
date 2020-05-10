@@ -56,7 +56,7 @@ def search():
     for recipe in results:
         print(f"{recipe.name} [{recipe.lang}]")
 
-    resp = flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang()))
+    resp = flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang(), query=query_str))
     return resp
 
 
