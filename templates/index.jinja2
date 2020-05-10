@@ -15,7 +15,7 @@
         <a href="/all">Show All</a>
         {% if langs %} |
             {% for lang in langs %}
-                {% if loop.index0 != 0 %} &#9679; {% endif %}
+                {% if loop.index0 != 0 %}&middot;{% endif %}
 
                 {% if lang == active_lang %}
                     {{ lang }}
