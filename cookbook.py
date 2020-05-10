@@ -181,7 +181,10 @@ class Recipe:
         for old_ingr in self.total_ingredients:
             if old_ingr.ingredient == new_ingr.ingredient:
                 if old_ingr.unit == new_ingr.unit:
-                    old_ingr.amount += new_ingr.amount
+                    if new_ingr.amount and not old_ingr.amount:
+                        old_ingr.amount = new_ingr.amount
+                    elif new_ingr.amount and old_ingr.amount:
+                        old_ingr.amount += new_ingr.amount
                     found = True
                 # TODO unit conversion
         if not found:

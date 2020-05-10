@@ -4,7 +4,6 @@ import os
 
 from cookbook import Cookbook
 
-
 app = Flask(__name__)
 app.config.from_json("config.json")
 
@@ -22,9 +21,11 @@ def lang():
 @app.route('/')
 def index():
     if request.args.get("lang") in book.by_language:
-        resp = flask.make_response(flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=request.args.get("lang")))
+        resp = flask.make_response(
+            flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=request.args.get("lang")))
     else:
-        resp = flask.make_response(flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=lang()))
+        resp = flask.make_response(
+            flask.render_template('index.jinja2', langs=book.by_language.keys(), active_lang=lang()))
 
     # Fix broken cookies
     if request.cookies.get("lang") not in book.by_language:
@@ -53,6 +54,7 @@ def search():
             if norm_query in recipe.name:
                 results.add(recipe)
 
+    results = sorted(results, key=lambda r: r.name)
     for recipe in results:
         print(f"{recipe.name} [{recipe.lang}]")
 
@@ -62,7 +64,7 @@ def search():
 
 @app.route("/all")
 def all():
-    results = book.by_language[lang()]
+    results = sorted(book.by_language[lang()], key=lambda r: r.name)
     return flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang()))
 
 
