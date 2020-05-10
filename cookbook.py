@@ -65,7 +65,7 @@ class Recipe:
                  mis_en_place: List[Dict[str, str]] = None,
                  cooking: List[Dict[str, str]] = None,
                  passive_cooking: List[Dict[str, str]] = None):
-        self.id: str = id
+        self.id: str = id.lower().replace(' ', '-')
         self.lang: str = lang
         self.name: str = name
         self.serves: int = serves
@@ -189,7 +189,15 @@ class Recipe:
                 # TODO unit conversion
         if not found:
             self.ingr_bag.add(new_ingr.ingredient.lower())
-            self.total_ingredients.append(Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
+            if not new_ingr.amount:  # ingredients without amounts go to the end
+                self.total_ingredients.append(Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
+            else:  # ingredients with amounts go before ingredients without amounts
+                i = 0
+                while i < len(self.total_ingredients):
+                    if not self.total_ingredients[i].amount:
+                        break
+                    i += 1
+                self.total_ingredients.insert(i, Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
 
     def has_ingredient(self, wanted_ingr: str) -> bool:
         return wanted_ingr.lower() in self.ingr_bag
