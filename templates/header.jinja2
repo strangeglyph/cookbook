@@ -1,0 +1,12 @@
+<div id="header">
+    <div id="logo-small-container">
+        <a href="/"><img id="logo-small" src="/static/logo.svg" alt="Cookbook"></a>
+    </div>
+    <div id="header-search">
+        <form id="header-search-form" action="/search">
+            <input id="header-search-bar" type="search" name="query" placeholder="{% if query %}{{ query | escape }}{% else %}Recipe name, tags, ...{% endif %}">
+            <input type="submit" value="&#x1F50D;" hidden>
+        </form>
+    </div>
+</div>
+<hr id="divider">

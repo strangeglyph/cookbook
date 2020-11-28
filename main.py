@@ -2,6 +2,7 @@ import flask
 from flask import Flask, request
 import os
 
+import formatting
 import searchparser
 from cookbook import Cookbook
 
@@ -66,6 +67,42 @@ def all():
     return flask.make_response(flask.render_template('listing.jinja2', results=results, active_lang=lang()))
 
 
+@app.route("/recipe/<recipe_id>")
+def recipe(recipe_id: str):
+    if recipe_id not in book.by_id:
+        return flask.make_response(flask.render_template('listing.jinja2', results=[], active_lang=lang()))
+
+    recipe_trans = book.by_id[recipe_id]
+    if lang() in recipe_trans.translations:
+        recipe = recipe_trans.translations[lang()]
+    elif app.config["defaultlang"] in recipe_trans.translations:
+        recipe = recipe_trans.translations[app.config["defaultlang"]]
+    else:
+        recipe = next(recipe_trans.translations.values())
+
+    return flask.make_response(flask.render_template('recipe.jinja2', recipe=recipe, recipe_trans=recipe_trans, active_lang=lang()))
+
+
+@app.template_filter()
+def format_num(value):
+    if not value:
+        return ""
+    try:
+        return formatting.format_num(float(value))
+    except ValueError:
+        return value
+
+
+@app.template_filter()
+def round_up(value):
+    if not value:
+        return ""
+    try:
+        return formatting.round_up(float(value))
+    except ValueError:
+        return value
+
+
 if __name__ == "__main__":
     extra_dirs = ["templates", "static"]
     extra_files = extra_dirs[:]
@@ -90,3 +127,4 @@ if __name__ == "__main__":
 
     app.run(extra_files=extra_files)
     app.run()
+

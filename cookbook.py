@@ -56,6 +56,9 @@ class RecipeStep:
             else:
                 self.yields = [yields]
 
+    def rows(self):
+        return max(1, len(self.ingredients) + len(self.internal_ingredients))
+
 
 class Recipe:
     def __init__(self, id: str, lang: str, name: str, serves: int,
@@ -77,7 +80,6 @@ class Recipe:
         if note:
             for word in note.split():
                 self.word_bag.add(word.lower())
-
 
         self.total_ingredients: List[Ingredient] = []
         self.ingr_bag: Set[str] = set()

@@ -2,26 +2,16 @@
 {% block title %}Cookbook{% endblock %}
 {% block header %}Cookbook{% endblock %}
 {% block content %}
-    <div id="header">
-        <div id="logo-small-container">
-            <a href="/"><img id="logo-small" src="/static/logo.svg" alt="Cookbook"></a>
-        </div>
-        <div id="header-search">
-            <form id="header-search-form" action="/search">
-                <input id="header-search-bar" type="search" name="query" placeholder="{{ query | escape }}">
-                <input type="submit" value="&#x1F50D;" hidden>
-            </form>
-        </div>
-    </div>
-    <hr id="divider">
+    {% include 'header.jinja2' %}
+
     <div id="results">
         {% if not results %}
             No recipes found!
         {% else %}
             {% for recipe in results %}
                 <div class="result">
-                    <img class="result-image" src="/static/no-image.png">
-                    <span class="result-name">{{ recipe.name }}</span>
+                    <a class="result-image" href="/recipe/{{ recipe.id | urlencode }}"><img alt="An image of {{ recipe.name | escape }}" src="/static/no-image.png"></a>
+                    <a class="result-name" href="/recipe/{{ recipe.id | urlencode }}">{{ recipe.name }}</a>
                     <span class="result-description">{% if recipe.note %}{{ recipe.note }}{% endif %}</span>
                     <span class="result-tags">
                     {% for tag in recipe.tags %}
