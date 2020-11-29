@@ -5,8 +5,8 @@
     {% include 'header.jinja2' %}
     <style>
     #recipe {
-        grid-template-rows: [top] auto 1em
-                            [ingredient-begin] auto [ingredient-end] 2em
+        grid-template-rows: [top] auto 3em
+                            [ingredient-begin] auto [ingredient-end] 3em
                             [recipe-steps-begin]
         {% if recipe.prep %}
                             auto 2em
@@ -45,9 +45,9 @@
         <span id="recipe-ingredients-heading">Ingredients</span>
         <div id="recipe-ingredients">
             {% for ingr in recipe.total_ingredients %}
-                <span class="ingr-name">{{ ingr.ingredient }}</span>
                 <span class="ingr-amount">{{ ingr.amount|format_num }}</span>
                 <span class="ingr-unit">{% if ingr.unit %}{{ ingr.unit }}{% endif %}</span>
+                <span class="ingr-name">{{ ingr.ingredient }}</span>
             {% endfor %}
         </div>
         {% set rows = namespace(start = 5, count = 0) %}
@@ -59,19 +59,13 @@
             {% set rows.count = 0 %}
             <div class="step-ingredients">
                 {% for ingr in step.ingredients %}
-                    <span class="step-ingr-amount" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.amount|format_num }}
-                    </span>
-                    <span class="step-ingr-unit" style="grid-row: {{ rows.start + rows.count }}">
-                        {% if ingr.unit %}{{ ingr.unit }}{% endif %}
-                    </span>
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.ingredient }}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr.amount|format_num }} {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
                 {% for ingr in step.internal_ingredients %}
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
                         {{ ingr }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
@@ -90,19 +84,13 @@
             {% set rows.count = 0 %}
             <div class="step-ingredients">
                 {% for ingr in step.ingredients %}
-                    <span class="step-ingr-amount" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.amount|format_num }}
-                    </span>
-                    <span class="step-ingr-unit" style="grid-row: {{ rows.start + rows.count }}">
-                        {% if ingr.unit %}{{ ingr.unit }}{% endif %}
-                    </span>
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.ingredient }}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr.amount|format_num }} {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
                 {% for ingr in step.internal_ingredients %}
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
                         {{ ingr }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
@@ -121,19 +109,13 @@
             {% set rows.count = 0 %}
             <div class="step-ingredients">
                 {% for ingr in step.ingredients %}
-                    <span class="step-ingr-amount" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.amount|format_num }}
-                    </span>
-                    <span class="step-ingr-unit" style="grid-row: {{ rows.start + rows.count }}">
-                        {% if ingr.unit %}{{ ingr.unit }}{% endif %}
-                    </span>
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.ingredient }}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr.amount|format_num }} {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
                 {% for ingr in step.internal_ingredients %}
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
                         {{ ingr }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
@@ -152,19 +134,13 @@
             {% set rows.count = 0 %}
             <div class="step-ingredients">
                 {% for ingr in step.ingredients %}
-                    <span class="step-ingr-amount" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.amount|format_num }}
-                    </span>
-                    <span class="step-ingr-unit" style="grid-row: {{ rows.start + rows.count }}">
-                        {% if ingr.unit %}{{ ingr.unit }}{% endif %}
-                    </span>
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
-                        {{ ingr.ingredient }}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr.amount|format_num }} {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
                 {% for ingr in step.internal_ingredients %}
-                    <span class="step-ingr-name" style="grid-row: {{ rows.start + rows.count }}">
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
                         {{ ingr }}
                     </span>
                     {% set rows.count = rows.count + 1 %}
