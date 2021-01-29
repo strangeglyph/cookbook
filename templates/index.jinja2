@@ -6,23 +6,28 @@
         <img id="logo-big" src="/static/logo.svg" alt="Cookbook">
     </div>
     <div id="search">
-        <form id="search-form" action="/search">
-            <input id="search-bar" type="search" name="query" placeholder="Recipe name, tags, ...">
+        <form id="search-form" role="search" action="/{{ active_lang }}/search">
+            <input id="search-bar"
+                   type="text"
+                   name="query"
+                   aria-label="{{ localize("searchbar.hint") }}"
+                   placeholder="{{ localize("searchbar.hint") }}">
             <input type="submit" value="&#x1F50D;" hidden>
         </form>
     </div>
     <div id="nav">
-        <a href="/all">Show All</a>
-        {% if langs %} |
-            {% for lang in langs %}
-                {% if loop.index0 != 0 %}&middot;{% endif %}
+        <a href="/all">{{ localize("main.showall") }}</a>
 
-                {% if lang == active_lang %}
-                    {{ lang }}
-                {% else %}
-                    <a href="/?lang={{ lang }}">{{ lang }}</a>
-                {% endif %}
-            {% endfor %}
+        {% if langs|length > 1 %}
+        {% for lang in langs %}
+            {% if loop.index0 != 0 %}&middot;{% endif %}
+
+            {% if lang == active_lang %}
+                {{ lang }}
+            {% else %}
+                <a href="/{{ lang }}/">{{ lang }}</a>
+            {% endif %}
+        {% endfor %}
         {% endif %}
     </div>
 {% endblock %}

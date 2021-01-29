@@ -3,8 +3,12 @@
         <a href="/"><img id="logo-small" src="/static/logo.svg" alt="Cookbook"></a>
     </div>
     <div id="header-search">
-        <form id="header-search-form" action="/search">
-            <input id="header-search-bar" type="search" name="query" placeholder="{% if query %}{{ query | escape }}{% else %}Recipe name, tags, ...{% endif %}">
+        <form id="header-search-form" role="search" action="/search">
+            <input id="header-search-bar"
+                   type="text"
+                   name="query"
+                   aria-label="{% if query %}{{ query | escape }}{% else %}{{ localize("searchbar.hint") }}{% endif %}"
+                   placeholder="{% if query %}{{ query | escape }}{% else %}{{ localize("searchbar.hint") }}{% endif %}">
             <input type="submit" value="&#x1F50D;" hidden>
         </form>
     </div>

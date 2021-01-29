@@ -37,7 +37,7 @@ def format_num(num: float) -> str:
         return "3"
     elif num <= 3.75:
         return "3 ½"
-    elif num <= 4.25:
+    elif num <= 4.33:
         return "4"
     elif num <= 5:
         return "5"

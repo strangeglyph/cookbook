@@ -13,14 +13,18 @@ class LoadException(Exception):
 
 
 class Ingredient:
-    def __init__(self, ingredient: str, amount: int = None, unit: str = None):
+    def __init__(self, serves: int, ingredient: str, amount: int = None, unit: str = None):
         self.ingredient: str = ingredient
         self.amount: Optional[int] = amount
+        if self.amount:
+            self.amount_per_serving = self.amount / serves
+        else:
+            self.amount_per_serving = None
         self.unit: Optional[str] = unit
 
 
 class RecipeStep:
-    def __init__(self, instructions: str,
+    def __init__(self, serves: int, instructions: str,
                  ingredients: List[Dict[str,str]] = None,
                  internal_ingredients: List[str] = None,
                  yields: Union[str, List[str]] = None):
@@ -30,9 +34,9 @@ class RecipeStep:
         if ingredients is not None:
             for i, ingredient in enumerate(ingredients):
                 try:
-                    self.ingredients.append(Ingredient(**ingredient))
+                    self.ingredients.append(Ingredient(serves, **ingredient))
                 except TypeError as e:
-                    if "ingredient" in ingredient:
+                    if "ingredient" in ingredient and type(ingredient) == map:
                         ing_id = f"{i} ({ingredient['ingredient']})"
                     else:
                         ing_id = f"{i}"
@@ -42,6 +46,8 @@ class RecipeStep:
                     elif e.args and 'unexpected keyword argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
                         raise LoadException(f"ingredient {ing_id} contains an unknown key: '{field}'")
+                    elif e.args and 'must be a mapping' in e.args[0]:
+                        raise LoadException(f"ingredient {ing_id} should be an object, but was a {type(ingredient)} ('{ingredient}')")
                     else:
                         raise e
 
@@ -62,6 +68,8 @@ class RecipeStep:
 
 class Recipe:
     def __init__(self, id: str, lang: str, name: str, serves: int,
+                 servings_unit: str = "",
+                 servings_increment: Union[float, int] = 1,
                  note: str = None,
                  tags: Union[str, List[str]] = None,
                  prep: List[Dict[str, str]] = None,
@@ -72,6 +80,8 @@ class Recipe:
         self.lang: str = lang
         self.name: str = name
         self.serves: int = serves
+        self.servings_unit: str = servings_unit
+        self.servings_increment: Union[float, int] = servings_increment
         self.note: Optional[str] = note
         self.word_bag: Set[str] = set()
 
@@ -98,7 +108,7 @@ class Recipe:
         if prep is not None:
             for i, step in enumerate(prep):
                 try:
-                    rstep = RecipeStep(**step)
+                    rstep = RecipeStep(self.serves, **step)
                     self.prep.append(rstep)
                     for ingr in rstep.ingredients:
                         self.merge_ingredient(ingr)
@@ -119,7 +129,7 @@ class Recipe:
         if mis_en_place is not None:
             for i, step in enumerate(mis_en_place):
                 try:
-                    rstep = RecipeStep(**step)
+                    rstep = RecipeStep(self.serves, **step)
                     self.mis_en_place.append(rstep)
                     for ingr in rstep.ingredients:
                         self.merge_ingredient(ingr)
@@ -140,7 +150,7 @@ class Recipe:
         if cooking is not None:
             for i, step in enumerate(cooking):
                 try:
-                    rstep = RecipeStep(**step)
+                    rstep = RecipeStep(self.serves, **step)
                     self.cooking.append(rstep)
                     for ingr in rstep.ingredients:
                         self.merge_ingredient(ingr)
@@ -161,7 +171,7 @@ class Recipe:
         if passive_cooking is not None:
             for i, step in enumerate(passive_cooking):
                 try:
-                    rstep = RecipeStep(**step)
+                    rstep = RecipeStep(self.serves, **step)
                     self.passive_cooking.append(rstep)
                     for ingr in rstep.ingredients:
                         self.merge_ingredient(ingr)
@@ -185,21 +195,23 @@ class Recipe:
                 if old_ingr.unit == new_ingr.unit:
                     if new_ingr.amount and not old_ingr.amount:
                         old_ingr.amount = new_ingr.amount
+                        old_ingr.amount_per_serving = new_ingr.amount_per_serving
                     elif new_ingr.amount and old_ingr.amount:
                         old_ingr.amount += new_ingr.amount
+                        old_ingr.amount_per_serving += new_ingr.amount_per_serving
                     found = True
                 # TODO unit conversion
         if not found:
             self.ingr_bag.add(new_ingr.ingredient.lower())
             if not new_ingr.amount:  # ingredients without amounts go to the end
-                self.total_ingredients.append(Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
+                self.total_ingredients.append(Ingredient(self.serves, new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
             else:  # ingredients with amounts go before ingredients without amounts
                 i = 0
                 while i < len(self.total_ingredients):
                     if not self.total_ingredients[i].amount:
                         break
                     i += 1
-                self.total_ingredients.insert(i, Ingredient(new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
+                self.total_ingredients.insert(i, Ingredient(self.serves, new_ingr.ingredient, new_ingr.amount, new_ingr.unit))
 
     def has_ingredient(self, wanted_ingr: str) -> bool:
         return wanted_ingr.lower() in self.ingr_bag
