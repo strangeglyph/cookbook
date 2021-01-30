@@ -270,5 +270,55 @@
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
+        {% if recipe.cooking2 %}
+            <span class="recipe-section-heading" style="grid-row : {{ rows.start }}">{{ localize("recipe.section.cooking.heading") }}</span>
+            {% set rows.start = rows.start + 2 %}
+        {% endif %}
+        {% for step in recipe.cooking2 %}
+            {% set rows.count = 0 %}
+            <div class="step-ingredients">
+                {% for ingr in step.ingredients %}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        <span class="any-ingr-amount">{{ ingr.amount|format_num }}</span> {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
+                    </span>
+                    {% set rows.count = rows.count + 1 %}
+                {% endfor %}
+                {% for ingr in step.internal_ingredients %}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr }}
+                    </span>
+                    {% set rows.count = rows.count + 1 %}
+                {% endfor %}
+            </div>
+            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                {{ step.instructions }}
+            </div>
+            {% set rows.start = rows.start + step.rows() + 1 %}
+        {% endfor %}
+        {% if recipe.passive_cooking2 %}
+            <span class="recipe-section-heading" style="grid-row : {{ rows.start }}">{{ localize("recipe.section.passivecooking.heading") }}</span>
+            {% set rows.start = rows.start + 2 %}
+        {% endif %}
+        {% for step in recipe.passive_cooking2 %}
+            {% set rows.count = 0 %}
+            <div class="step-ingredients">
+                {% for ingr in step.ingredients %}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        <span class="any-ingr-amount">{{ ingr.amount|format_num }}</span> {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
+                    </span>
+                    {% set rows.count = rows.count + 1 %}
+                {% endfor %}
+                {% for ingr in step.internal_ingredients %}
+                    <span class="step-ingr-hint" style="grid-row: {{ rows.start + rows.count }}">
+                        {{ ingr }}
+                    </span>
+                    {% set rows.count = rows.count + 1 %}
+                {% endfor %}
+            </div>
+            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                {{ step.instructions }}
+            </div>
+            {% set rows.start = rows.start + step.rows() + 1 %}
+        {% endfor %}
     </div>
 {% endblock %}

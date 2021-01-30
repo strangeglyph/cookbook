@@ -75,7 +75,9 @@ class Recipe:
                  prep: List[Dict[str, str]] = None,
                  mis_en_place: List[Dict[str, str]] = None,
                  cooking: List[Dict[str, str]] = None,
-                 passive_cooking: List[Dict[str, str]] = None):
+                 passive_cooking: List[Dict[str, str]] = None,
+                 cooking2: List[Dict[str, str]] = None,
+                 passive_cooking2: List[Dict[str, str]] = None):
         self.id: str = id.lower().replace(' ', '-')
         self.lang: str = lang
         self.name: str = name
@@ -186,6 +188,48 @@ class Recipe:
                         raise e
                 except LoadException as e:
                     e.args = (f"Recipe {id}.{lang}: passive step {i}: {e.args[0]}",)
+                    raise e
+
+        self.cooking2: List[RecipeStep] = []
+        if cooking2 is not None:
+            for i, step in enumerate(cooking2):
+                try:
+                    rstep = RecipeStep(self.serves, **step)
+                    self.cooking2.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
+                except TypeError as e:
+                    if e.args and 'required positional argument' in e.args[0]:
+                        field = e.args[0].split('\'')[1]
+                        raise LoadException(f"Recipe {id}.{lang}: cooking section 2 step {i} is missing a required field: '{field}'")
+                    elif e.args and 'unexpected keyword argument' in e.args[0]:
+                        field = e.args[0].split('\'')[1]
+                        raise LoadException(f"Recipe {id}.{lang}: cooking section 2 step {i} contains an unknown key: '{field}'")
+                    else:
+                        raise e
+                except LoadException as e:
+                    e.args = (f"Recipe {id}.{lang}: cooking section 2 step {i}: {e.args[0]}",)
+                    raise e
+
+        self.passive_cooking2: List[RecipeStep] = []
+        if passive_cooking2 is not None:
+            for i, step in enumerate(passive_cooking2):
+                try:
+                    rstep = RecipeStep(self.serves, **step)
+                    self.passive_cooking2.append(rstep)
+                    for ingr in rstep.ingredients:
+                        self.merge_ingredient(ingr)
+                except TypeError as e:
+                    if e.args and 'required positional argument' in e.args[0]:
+                        field = e.args[0].split('\'')[1]
+                        raise LoadException(f"Recipe {id}.{lang}: passive section 2 step {i} is missing a required field: '{field}'")
+                    elif e.args and 'unexpected keyword argument' in e.args[0]:
+                        field = e.args[0].split('\'')[1]
+                        raise LoadException(f"Recipe {id}.{lang}: passive section 2step {i} contains an unknown key: '{field}'")
+                    else:
+                        raise e
+                except LoadException as e:
+                    e.args = (f"Recipe {id}.{lang}: passive section 2 step {i}: {e.args[0]}",)
                     raise e
 
     def merge_ingredient(self, new_ingr: Ingredient):
