@@ -10,6 +10,8 @@ python3Packages.buildPythonApplication rec {
     pythonImportsCheck = [ "flask" "ruamel.yaml" ];
     doCheck = false;
 
+    postInstall = "cp -r cookbook/static $out/static";
+
     meta = with lib; {
         homepage = "https://github.com/strangeglyph/cookbook";
         description = "Flask application to serve recipes";
