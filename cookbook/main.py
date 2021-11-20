@@ -1,26 +1,29 @@
 import flask
 from flask import Flask, request, g
 import os
+import sys
 
-from jinja2 import contextfilter
 from ruamel.yaml import YAML
 
-import formatting
-import searchparser
-from cookbook import Cookbook
+from cookbook import formatting
+from cookbook import searchparser
+from cookbook.cookbook import Cookbook
 
 app = Flask(__name__)
-app.config.from_json("config.json")
+if len(sys.argv) > 1:
+    app.config.from_json(sys.argv[1])
+else:
+    app.config.from_json("config.json")
 
 book = Cookbook()
 yaml = YAML()
 
 LOC_FILES = {}
-for file in os.listdir("localization"):
+for file in os.listdir("../localization"):
     if os.path.splitext(file)[1] == '.yml':
         lang = os.path.splitext(file)[0]
         print(f"Loading localization file for {lang}")
-        loc_file_path = os.path.join("localization", file)
+        loc_file_path = os.path.join("../localization", file)
         with open(loc_file_path) as loc_file:
             LOC_FILES[lang] = yaml.load(loc_file)
 
@@ -155,6 +158,18 @@ def localize(string):
         return string
 
 
+book, errors = Cookbook.load_folder(app.config["COOKBOOK_LOCATION"])
+print(f"Cookbook: {len(book.by_id)} recipes loaded (path: {app.config['COOKBOOK_LOCATION']})")
+for language, collection in book.by_language.items():
+    print(f"- {language}: {len(collection)}")
+if errors:
+    print("The following errors occurred while trying to load recipes:")
+    for error in errors:
+        print(f"- {error.args[0]}")
+
+if "defaultlang" not in app.config:
+    app.config["defaultlang"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
+
 if __name__ == "__main__":
     extra_dirs = ["templates", "static"]
     extra_files = extra_dirs[:]
@@ -165,18 +180,5 @@ if __name__ == "__main__":
                 if os.path.isfile(filename):
                     extra_files.append(filename)
 
-    book, errors = Cookbook.load_folder(app.config["COOKBOOK_LOCATION"])
-    print(f"Cookbook: {len(book.by_id)} recipes loaded")
-    for language, collection in book.by_language.items():
-        print(f"- {language}: {len(collection)}")
-    if errors:
-        print("The following errors occurred while trying to load recipes:")
-        for error in errors:
-            print(f"- {error.args[0]}")
-
-    if "defaultlang" not in app.config:
-        app.config["defaultlang"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
-
     app.run(extra_files=extra_files)
-    app.run()
 

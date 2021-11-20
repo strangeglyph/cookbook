@@ -36,6 +36,20 @@
                             repeat({{ step.rows() }}, auto)
                             2em
         {% endfor %}
+        {% if recipe.cooking2 %}
+                            auto 2em
+        {% endif %}
+        {% for step in recipe.cooking2 %}
+                            repeat({{ step.rows() }}, auto)
+                            2em
+        {% endfor %}
+        {% if recipe.passive_cooking2 %}
+                            auto 2em
+        {% endif %}
+        {% for step in recipe.passive_cooking2 %}
+                            repeat({{ step.rows() }}, auto)
+                            2em
+        {% endfor %}
         ;
     }
     </style>
