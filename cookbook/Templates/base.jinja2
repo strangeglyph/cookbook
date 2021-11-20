@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        <link rel="stylesheet" href="/cookbook/staticok/static/style.css"/>
+        <link rel="icon" type="image/png" href="/cookbook/staticok/static/favicon.png"/>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message|e }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <div id="content">{% block content %}{% endblock %}</div>
+
+    <div id="footer">
+        <div id="attribution">Logo CC-BY by <a href="https://thenounproject.com/marcella.cigarini">Marcella Cigarini</a></div>
+    </div>
+{% endblock %}
+</body>
+</html>

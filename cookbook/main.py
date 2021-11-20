@@ -1,6 +1,7 @@
 import flask
 from flask import Flask, request, g
 import os
+import os.path
 import sys
 
 from ruamel.yaml import YAML
@@ -9,7 +10,12 @@ from cookbook import formatting
 from cookbook import searchparser
 from cookbook.cookbook import Cookbook
 
-app = Flask(__name__)
+
+def get_data_path(relpath: str) -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relpath)
+
+
+app = Flask(__name__, template_folder=get_data_path("Templates"))
 if len(sys.argv) > 1:
     app.config.from_json(sys.argv[1])
 else:
@@ -19,11 +25,11 @@ book = Cookbook()
 yaml = YAML()
 
 LOC_FILES = {}
-for file in os.listdir("../localization"):
+for file in os.listdir(get_data_path("localization")):
     if os.path.splitext(file)[1] == '.yml':
         lang = os.path.splitext(file)[0]
         print(f"Loading localization file for {lang}")
-        loc_file_path = os.path.join("../localization", file)
+        loc_file_path = os.path.join(get_data_path("localization"), file)
         with open(loc_file_path) as loc_file:
             LOC_FILES[lang] = yaml.load(loc_file)
 

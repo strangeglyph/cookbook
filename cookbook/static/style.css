@@ -1,0 +1,253 @@
+body {
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    margin: auto;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+
+#content {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#logo-big-container {
+    margin-top: 7vh;
+}
+
+#logo-big {
+    height: 26vh;
+}
+
+#search {
+    margin-top: 7vh;
+    height: 100%;
+}
+
+#search-form {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#search-bar {
+    font-size: 2em;
+    height: 4rem;
+    width: 48rem;
+    padding-left: .5em;
+    padding-right: .5em;
+    box-shadow: 0 4px 8px;
+}
+
+@media only screen and (max-width: 50rem) {
+    #search-bar {
+        font-size: 1.5em;
+        height: 3rem;
+        width: 80vw;
+    }
+}
+
+#header {
+    width: 95vw;
+    margin-bottom: 0;
+    display: grid;
+    grid-template-columns: 4em auto 4em;
+}
+
+#logo-small-container {
+    margin-top: 1em;
+    grid-column: 1 / span 1;
+}
+
+#header-search {
+    grid-column: 2 / span 1;
+    place-self: center;
+}
+
+#header-search-bar {
+    font-size: 1.5em;
+    height: 3rem;
+    width: 48rem;
+    box-shadow: 0 4px 8px;
+    padding-left: .5em;
+    padding-right: .5em;
+}
+
+.divider {
+    border-bottom: 1px solid lightgrey;
+    width: 32em;
+    margin-bottom: 2em;
+}
+
+#results {
+    display: grid;
+    width: 67em;
+    grid-template-areas: "a a";
+    grid-gap: 1em;
+}
+
+.result {
+    width: 33em;
+    border: 1px solid gray;
+    display: grid;
+    grid-template-rows: [top] 1em auto 1em 1px [bottom];
+    grid-template-columns: [left] 150px [text] auto [text-end] 0.5em;
+    grid-gap: 0.5em 1em;
+    font-size: 11pt;
+}
+
+.result-image {
+    grid-row: top / bottom;
+    grid-column: left / text;
+    height: 150px;
+}
+
+.result-name {
+    grid-row: top / span 1;
+    grid-column: text / text-end;
+    font-weight: bold;
+    color: inherit;
+    text-decoration: none;
+}
+
+.result-description {
+    grid-row: 2 / span 1;
+    grid-column: text / text-end;
+}
+
+.result-tags {
+    grid-row: 3 / span 1;
+    grid-column: text / text-end;
+    font-size: smaller;
+    font-style: italic;
+}
+
+a.result-tag {
+    color: #6f6f7f;
+}
+
+a:visited.result-tag {
+    color: #6f6f7f;
+}
+
+#nav {
+    margin-top: 1em;
+}
+
+#recipe {
+    display: grid;
+    width: 60em;
+    grid-template-columns: [ingr-hint-begin] auto [ingr-hint-end content-begin] 66% [content-end];
+    column-gap: 1em;
+}
+
+#recipe-title {
+    font-size: 4rem;
+    grid-column: 1 / content-end;
+    grid-row: 1 / span 1;
+    border-bottom: 2px #7f7f7f;
+    text-align: center;
+}
+
+#recipe-servings-and-lang {
+    grid-column: 1 / content-end;
+    grid-row: 2 / span 1;
+    display: flex;
+    justify-content: space-between;
+}
+
+#recipe-servings {
+    grid-column: -2 / span 1;
+    grid-row: 4 / span 1;
+    justify-self: right;
+    padding-right: 1em;
+}
+
+#recipe-lang {
+    grid-column: -2 / span 1;
+    grid-row: 3 / span 1;
+    justify-self: right;
+    padding-right: 1em;
+}
+
+#recipe-lang {
+    padding-left: 3em;
+}
+
+.recipe-section-heading {
+    font-size: 2rem;
+    grid-column: 1 / content-end;
+    border-bottom: 1px #7f7f7f;
+    text-align: center;
+}
+
+#recipe-ingredients-heading {
+    grid-column: ingr-hint-begin / ingr-hint-end;
+    grid-row: ingredient-begin / ingredient-end;
+    text-align: right;
+    font-style: italic;
+}
+
+#recipe-ingredients {
+    grid-column: content-begin / content-end;
+    grid-row: ingredient-begin / ingredient-end;
+}
+
+
+#recipe-ingredients {
+    display: grid;
+    grid-template-columns: [ingr-amnt] max-content .5em [ingr-unit] max-content 1.5em [ingr-name] auto [end];
+    grid-auto-rows: auto;
+    border-left: 1px solid #7f7f7f;
+    padding-left: 1em;
+}
+
+
+.step-ingredients {
+    display: contents;
+}
+
+.ingr-amount {
+    grid-column: ingr-amnt / span 1;
+    text-align: right;
+}
+
+.ingr-unit {
+    grid-column: ingr-unit / span 1;
+}
+
+.ingr-name {
+    grid-column: ingr-name / span 1;
+}
+
+.step-ingr-hint {
+    grid-column: ingr-hint-begin / ingr-hint-end;
+    text-align: right;
+}
+
+.step-instructions {
+    grid-column: content-begin / content-end;
+    border-left: 1px solid #7f7f7f;
+    padding-left: 1em;
+    padding-top: .25em;
+    min-height: 3em;
+}
+
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    margin-left: .5em;
+    margin-bottom: .5em;
+    border-top: 5px darkgray;
+    font-size: 10pt;
+}
+
+#footer a {
+    color: #7f7f7f;
+}
+
