@@ -1,11 +1,11 @@
-{ lib, python3Packages }:
+{ lib, pkgs, ... }:
 
-python3Packages.buildPythonApplication rec {
+pkgs.python3Packages.buildPythonPackage rec {
     pname = "cookbook";
     version = "0.1.0";
     src = ./.;
 
-    propagatedBuildInputs = with python3Packages; [ flask ruamel-yaml ];
+    propagatedBuildInputs = with pkgs.python3Packages; [ flask ruamel-yaml ];
 
     pythonImportsCheck = [ "flask" "ruamel.yaml" ];
     doCheck = false;
