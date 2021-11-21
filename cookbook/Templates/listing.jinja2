@@ -10,7 +10,7 @@
         {% else %}
             {% for recipe in results %}
                 <div class="result">
-                    <a class="result-image" href="/recipe/{{ recipe.id | urlencode }}"><img alt="An image of {{ recipe.name | escape }}" src="/cookbook/staticok/static/no-image.png"></a>
+                    <a class="result-image" href="/recipe/{{ recipe.id | urlencode }}"><img alt="An image of {{ recipe.name | escape }}" src="/static/no-image.png"></a>
                     <a class="result-name" href="/recipe/{{ recipe.id | urlencode }}">{{ recipe.name }}</a>
                     <span class="result-description">{% if recipe.descr %}{{ recipe.descr }}{% endif %}</span>
                     <span class="result-tags">
