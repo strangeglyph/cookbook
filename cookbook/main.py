@@ -99,7 +99,8 @@ def search():
 @app.route("/all")
 @app.route("/<lang>/all")
 def all():
-    results = sorted(book.by_language[lang()], key=lambda r: r.name)
+    all_except_hidden = filter(lambda recipe: not recipe.hidden_from_all, book.by_language[lang()])
+    results = sorted(all_except_hidden, key=lambda r: r.name)
     g.response.data = flask.render_template('listing.jinja2', results=results)
     return g.response
 
