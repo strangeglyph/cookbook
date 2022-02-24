@@ -138,6 +138,10 @@ a:visited.result-tag {
     margin-top: 1em;
 }
 
+#index-lang {
+    text-align: center;
+}
+
 #recipe {
     display: grid;
     width: 60em;

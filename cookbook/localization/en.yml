@@ -7,3 +7,4 @@ recipe.languagehint: "Other languages:"
 recipe.servingshint: "Servings:"
 searchbar.hint: Recipe name, tags, ...
 main.showall: Show All
+main.try-common-tags: "Try:"

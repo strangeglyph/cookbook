@@ -16,8 +16,7 @@
         </form>
     </div>
     <div id="nav">
-        <a href="/all">{{ localize("main.showall") }}</a>
-
+        <div id="index-lang">
         {% if langs|length > 1 %}
         {% for lang in langs %}
             {% if loop.index0 != 0 %}&middot;{% endif %}
@@ -29,5 +28,21 @@
             {% endif %}
         {% endfor %}
         {% endif %}
+        </div>
+
+        <div>
+            <a href="/all">{{ localize("main.showall") }}</a>
+            &nbsp;&mdash;&nbsp;
+            {{ localize("main.try-common-tags") }}
+            {% for tag in most_common_tags %}
+                {% if loop.index0 != 0 %}&middot;{% endif %}
+
+                {% if lang == active_lang %}
+                    {{ lang }}
+                {% else %}
+                    <a href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

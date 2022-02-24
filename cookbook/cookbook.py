@@ -335,6 +335,7 @@ class Cookbook:
     def __init__(self):
         self.by_id: Dict[str, RecipeTranslations] = {}
         self.by_language: Dict[str, List[Recipe]] = {}
+        self.tagcount_by_language: Dict[str, Dict[str, int]] = {}
 
     @staticmethod
     def load_folder(path: str) -> ("Cookbook", List[LoadException]):
@@ -357,8 +358,19 @@ class Cookbook:
 
                     if recipe.lang not in book.by_language:
                         book.by_language[recipe.lang] = []
+                        book.tagcount_by_language[recipe.lang] = {}
                     book.by_language[recipe.lang].append(recipe)
+
+                    for tag in recipe.tags_bag:
+                        if tag not in book.tagcount_by_language[recipe.lang]:
+                            book.tagcount_by_language[recipe.lang][tag] = 0
+                        book.tagcount_by_language[recipe.lang][tag] += 1
                 except LoadException as e:
                     errors.append(e)
 
         return book, errors
+
+    def most_common_tags(self, lang, threshold=4):
+        tag_counts = self.tagcount_by_language[lang]
+        sorted_tags = list(map(lambda x: x[0], sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)))
+        return sorted_tags[:threshold]

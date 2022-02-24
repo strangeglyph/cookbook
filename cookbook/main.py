@@ -73,7 +73,7 @@ def inject_language_stuff():
 @app.route('/')
 @app.route('/<lang>/')
 def index():
-    g.response.data = flask.render_template('index.jinja2', langs=book.by_language.keys())
+    g.response.data = flask.render_template('index.jinja2', langs=book.by_language.keys(), most_common_tags=book.most_common_tags(lang()))
     return g.response
 
 
