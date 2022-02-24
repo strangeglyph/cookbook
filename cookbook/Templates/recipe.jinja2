@@ -5,7 +5,13 @@
     {% include 'header.jinja2' %}
     <style>
     #recipe {
-        grid-template-rows: [top] auto 2em auto auto 3em
+        grid-template-rows: [top]
+                                auto /* title */
+                                auto /* note */
+                                2em /* spacer */
+                                auto /* lang selector */
+                                auto /* servings selector */
+                                3em /* spacer */
                             [ingredient-begin] auto [ingredient-end] 3em
                             [recipe-steps-begin]
         {% if recipe.prep %}
@@ -149,6 +155,12 @@
         <span id="recipe-title">{{ recipe.name }}</span>
         <span id="recipe-ingredients-heading">{{ localize("recipe.ingredients.heading") }}</span>
 
+        {% if recipe.note %}
+        <span id="recipe-note">
+            {{ recipe.note }}
+        </span>
+        {% endif %}
+
         {% if recipe_trans.translations.keys()|length > 1 %}
         <span id="recipe-lang">
             {{ localize("recipe.languagehint") }}
@@ -183,7 +195,8 @@
                 <span class="ingr-name">{{ ingr.ingredient }}</span>
             {% endfor %}
         </div>
-        {% set rows = namespace(start = 8, count = 0) %}
+
+        {% set rows = namespace(start = 9, count = 0) %}
         {% if recipe.prep %}
             <span class="recipe-section-heading" style="grid-row : {{ rows.start }}">{{ localize("recipe.section.prep.heading") }}</span>
             {% set rows.start = rows.start + 2 %}

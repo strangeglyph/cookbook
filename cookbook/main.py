@@ -17,9 +17,10 @@ def get_data_path(relpath: str) -> str:
 
 app = Flask(__name__, template_folder=get_data_path("Templates"))
 if len(sys.argv) > 1:
+    print(sys.argv)
     app.config.from_json(sys.argv[1])
 else:
-    app.config.from_json("config.json")
+    app.config.from_json("../config.json")
 
 book = Cookbook()
 yaml = YAML()
@@ -176,16 +177,4 @@ if errors:
 
 if "defaultlang" not in app.config:
     app.config["defaultlang"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
-
-if __name__ == "__main__":
-    extra_dirs = ["templates", "static"]
-    extra_files = extra_dirs[:]
-    for extra_dir in extra_dirs:
-        for dirname, dirs, files in os.walk(extra_dir):
-            for filename in files:
-                filename = os.path.join(dirname, filename)
-                if os.path.isfile(filename):
-                    extra_files.append(filename)
-
-    app.run(extra_files=extra_files)
 
