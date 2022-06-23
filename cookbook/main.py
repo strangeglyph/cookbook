@@ -18,9 +18,9 @@ def get_data_path(relpath: str) -> str:
 app = Flask(__name__, template_folder=get_data_path("Templates"))
 if len(sys.argv) > 1:
     print(sys.argv)
-    app.config.from_json(sys.argv[1])
+    app.config.from_file(sys.argv[1])
 else:
-    app.config.from_json("../config.json")
+    app.config.from_file("../config.json")
 
 book = Cookbook()
 yaml = YAML()
