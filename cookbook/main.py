@@ -3,6 +3,7 @@ from flask import Flask, request, g
 import os
 import os.path
 import sys
+import json
 
 from ruamel.yaml import YAML
 
@@ -18,9 +19,9 @@ def get_data_path(relpath: str) -> str:
 app = Flask(__name__, template_folder=get_data_path("Templates"))
 if len(sys.argv) > 1:
     print(sys.argv)
-    app.config.from_file(sys.argv[1])
+    app.config.from_file(sys.argv[1], load=json.load)
 else:
-    app.config.from_file("../config.json")
+    app.config.from_file("../config.json", load=json.load)
 
 book = Cookbook()
 yaml = YAML()
