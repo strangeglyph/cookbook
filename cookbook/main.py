@@ -126,6 +126,11 @@ def recipe(recipe_id: str):
     return g.response
 
 
+@app.route("/images/<path:path>")
+def images(path):
+    return flask.send_from_directory(os.path.join(app.config["COOKBOOK_LOCATION"], "images"), path)
+
+
 @app.template_filter()
 def format_num(value):
     if not value:

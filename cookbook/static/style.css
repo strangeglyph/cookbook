@@ -85,17 +85,16 @@ body {
 
 #results {
     display: grid;
-    width: 67em;
-    grid-template-areas: "a a";
+    grid-template-areas: "a";
     grid-gap: 1em;
 }
 
 .result {
-    width: 33em;
+    width: 45em;
     border: 1px solid gray;
     display: grid;
     grid-template-rows: [top] 1em auto 1em 1px [bottom];
-    grid-template-columns: [left] 150px [text] auto [text-end] 0.5em;
+    grid-template-columns: [left] 250px [text] auto [text-end] 0.5em;
     grid-gap: 0.5em 1em;
     font-size: 11pt;
 }
@@ -103,7 +102,12 @@ body {
 .result-image {
     grid-row: top / bottom;
     grid-column: left / text;
-    height: 150px;
+    height: 141px;
+}
+
+.result-image > img {
+    width: 250px;
+    height: 141px;
 }
 
 .result-name {

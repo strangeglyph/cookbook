@@ -84,7 +84,7 @@ class RecipeStep:
 
 
 class Recipe:
-    def __init__(self, id: str, lang: str, name: str, serves: int,
+    def __init__(self, recipe_foler: str, id: str, lang: str, name: str, serves: int,
                  servings_unit: str = "",
                  servings_increment: Union[float, int] = 1,
                  descr: str = None,
@@ -99,6 +99,7 @@ class Recipe:
                  cooking2: List[Dict[str, str]] = None,
                  passive_cooking2: List[Dict[str, str]] = None):
         self.id: str = id.lower().replace(' ', '-')
+        self.unformatted_id: str = id
         self.lang: str = lang
         self.name: str = name
         self.serves: int = serves
@@ -108,6 +109,7 @@ class Recipe:
         self.servings_increment: Union[float, int] = servings_increment
         self.descr: Optional[str] = descr
         self.note: Optional[str] = note
+        self.recipe_folder: str = recipe_foler
         self.word_bag: Set[str] = set()
 
         for word in name.split():
@@ -296,6 +298,23 @@ class Recipe:
     def has_word(self, wanted_word: str) -> bool:
         return wanted_word.lower() in self.word_bag
 
+    def image_path(self) -> str:
+        """
+        Search for a matching image in the images/ subfolder of the recipe folder. Image name
+        should be either the same as the recipe file name or in slug format (all lower case and spaces
+        replaced with dashes)
+        """
+        if os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.unformatted_id}.png")):
+            return f"/images/{self.unformatted_id}.png"
+        elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.unformatted_id}.jpg")):
+            return f"/images/{self.unformatted_id}.jpg"
+        elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.id}.png")):
+            return f"/images/{self.id}.png"
+        elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.id}.jpg")):
+            return f"/images/{self.id}.jpg"
+        else:
+            return "/static/no-image.png"
+
     @staticmethod
     def split_path(path: str) -> (str, str):
         _, fname = ospath.split(path)
@@ -310,10 +329,11 @@ class Recipe:
     @staticmethod
     def load(path: str) -> "Recipe":
 
+        recipe_folder, _ = os.path.split(path)
         recipe_id, lang = Recipe.split_path(path)
         try:
             with open(path, 'r', encoding="utf-8") as f:
-                recipe = Recipe(recipe_id, lang, **yaml.load(f))
+                recipe = Recipe(recipe_folder, recipe_id, lang, **yaml.load(f))
                 return recipe
         except TypeError as e:
             if e.args and 'required positional argument' in e.args[0]:
