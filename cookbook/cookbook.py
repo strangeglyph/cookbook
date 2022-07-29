@@ -44,6 +44,7 @@ class RecipeStep:
     def __init__(self, serves: int, instructions: str,
                  ingredients: List[Dict[str,str]] = None,
                  internal_ingredients: List[str] = None,
+                 hidden_ingredients: List[str] = None,
                  yields: Union[str, List[str]] = None):
         self.instructions: str = instructions
 
@@ -71,6 +72,10 @@ class RecipeStep:
         self.internal_ingredients: List[str] = []
         if internal_ingredients is not None:
             self.internal_ingredients = internal_ingredients
+
+        self.hidden_ingredients: List[str] = []
+        if hidden_ingredients is not None:
+            self.hidden_ingredients = hidden_ingredients
 
         self.yields: List[str] = []
         if yields is not None:
@@ -139,129 +144,44 @@ class Recipe:
                 update_tag_set(lang, norm_tag)
 
         self.prep: List[RecipeStep] = []
-        if prep is not None:
-            for i, step in enumerate(prep):
-                try:
-                    rstep = RecipeStep(self.serves, **step)
-                    self.prep.append(rstep)
-                    for ingr in rstep.ingredients:
-                        self.merge_ingredient(ingr)
-                except TypeError as e:
-                    if e.args and 'required positional argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: prep step {i + 1} is missing a required field: '{field}'")
-                    elif e.args and 'unexpected keyword argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: prep step {i + 1} contains an unknown key: '{field}'")
-                    else:
-                        raise e
-                except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: prep step {i + 1}: {e.args[0]}",)
-                    raise e
+        self.parse_section(prep, self.prep)
 
         self.mis_en_place: List[RecipeStep] = []
-        if mis_en_place is not None:
-            for i, step in enumerate(mis_en_place):
-                try:
-                    rstep = RecipeStep(self.serves, **step)
-                    self.mis_en_place.append(rstep)
-                    for ingr in rstep.ingredients:
-                        self.merge_ingredient(ingr)
-                except TypeError as e:
-                    if e.args and 'required positional argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: mis-en-place step {i + 1} is missing a required field: '{field}'")
-                    elif e.args and 'unexpected keyword argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: mis-en-place step {i + 1} contains an unknown key: '{field}'")
-                    else:
-                        raise e
-                except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: mis-en-place step {i + 1}: {e.args[0]}",)
-                    raise e
+        self.parse_section(mis_en_place, self.mis_en_place)
 
         self.cooking: List[RecipeStep] = []
-        if cooking is not None:
-            for i, step in enumerate(cooking):
-                try:
-                    rstep = RecipeStep(self.serves, **step)
-                    self.cooking.append(rstep)
-                    for ingr in rstep.ingredients:
-                        self.merge_ingredient(ingr)
-                except TypeError as e:
-                    if e.args and 'required positional argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: cooking step {i + 1} is missing a required field: '{field}'")
-                    elif e.args and 'unexpected keyword argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: cooking step {i + 1} contains an unknown key: '{field}'")
-                    else:
-                        raise e
-                except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: cooking step {i + 1}: {e.args[0]}",)
-                    raise e
+        self.parse_section(cooking, self.cooking)
 
         self.passive_cooking: List[RecipeStep] = []
-        if passive_cooking is not None:
-            for i, step in enumerate(passive_cooking):
-                try:
-                    rstep = RecipeStep(self.serves, **step)
-                    self.passive_cooking.append(rstep)
-                    for ingr in rstep.ingredients:
-                        self.merge_ingredient(ingr)
-                except TypeError as e:
-                    if e.args and 'required positional argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: passive step {i + 1} is missing a required field: '{field}'")
-                    elif e.args and 'unexpected keyword argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: passive step {i + 1} contains an unknown key: '{field}'")
-                    else:
-                        raise e
-                except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: passive step {i + 1}: {e.args[0]}",)
-                    raise e
+        self.parse_section(passive_cooking, self.passive_cooking)
 
         self.cooking2: List[RecipeStep] = []
-        if cooking2 is not None:
-            for i, step in enumerate(cooking2):
-                try:
-                    rstep = RecipeStep(self.serves, **step)
-                    self.cooking2.append(rstep)
-                    for ingr in rstep.ingredients:
-                        self.merge_ingredient(ingr)
-                except TypeError as e:
-                    if e.args and 'required positional argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: cooking section 2 step {i + 1} is missing a required field: '{field}'")
-                    elif e.args and 'unexpected keyword argument' in e.args[0]:
-                        field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: cooking section 2 step {i + 1} contains an unknown key: '{field}'")
-                    else:
-                        raise e
-                except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: cooking section 2 step {i + 1}: {e.args[0]}",)
-                    raise e
+        self.parse_section(cooking2, self.cooking2)
 
         self.passive_cooking2: List[RecipeStep] = []
-        if passive_cooking2 is not None:
-            for i, step in enumerate(passive_cooking2):
+        self.parse_section(passive_cooking2, self.passive_cooking2)
+
+    def parse_section(self, yaml_section: List[Dict[str, str]], list_section: List[RecipeStep]):
+        if yaml_section is not None:
+            for i, step in enumerate(yaml_section):
                 try:
                     rstep = RecipeStep(self.serves, **step)
-                    self.passive_cooking2.append(rstep)
+                    list_section.append(rstep)
                     for ingr in rstep.ingredients:
                         self.merge_ingredient(ingr)
                 except TypeError as e:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: passive section 2 step {i + 1} is missing a required field: '{field}'")
+                        raise LoadException(
+                            f"Recipe {self.id}.{self.lang}: prep step {i + 1} is missing a required field: '{field}'")
                     elif e.args and 'unexpected keyword argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
-                        raise LoadException(f"Recipe {id}.{lang}: passive section 2step {i + 1} contains an unknown key: '{field}'")
+                        raise LoadException(
+                            f"Recipe {self.id}.{self.lang}: prep step {i + 1} contains an unknown key: '{field}'")
                     else:
                         raise e
                 except LoadException as e:
-                    e.args = (f"Recipe {id}.{lang}: passive section 2 step {i + 1}: {e.args[0]}",)
+                    e.args = (f"Recipe {self.id}.{self.lang}: prep step {i + 1}: {e.args[0]}",)
                     raise e
 
     def merge_ingredient(self, new_ingr: Ingredient):
