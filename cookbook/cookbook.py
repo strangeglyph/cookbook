@@ -69,13 +69,9 @@ class RecipeStep:
                     else:
                         raise e
 
-        self.internal_ingredients: List[str] = []
-        if internal_ingredients is not None:
-            self.internal_ingredients = internal_ingredients
+        self.internal_ingredients: List[str] = internal_ingredients if internal_ingredients else []
 
-        self.hidden_ingredients: List[str] = []
-        if hidden_ingredients is not None:
-            self.hidden_ingredients = hidden_ingredients
+        self.hidden_ingredients: List[str] = hidden_ingredients if hidden_ingredients else []
 
         self.yields: List[str] = []
         if yields is not None:
@@ -109,7 +105,6 @@ class Recipe:
         self.name: str = name
         self.serves: int = serves
         self.hidden_from_all: bool = hidden_from_all
-        self.related_recipes: List[str] = related if related else []
         self.servings_unit: str = servings_unit
         self.servings_increment: Union[float, int] = servings_increment
         self.descr: Optional[str] = descr
@@ -125,6 +120,10 @@ class Recipe:
 
         self.total_ingredients: List[Ingredient] = []
         self.ingr_bag: Set[str] = set()
+
+        self.related_recipes: List[Union[str, Recipe]] = []
+        for related in (related or []):
+            self.related_recipes.append(related.lower().replace(' ', '-'))
 
         self.tags: List[str] = []
         self.tags_bag: Set[str] = set()
@@ -307,6 +306,19 @@ class Cookbook:
                         book.tagcount_by_language[recipe.lang][tag] += 1
                 except LoadException as e:
                     errors.append(e)
+
+        # Postprocess "related recipes"
+        for language in book.by_language.keys():
+            for recipe in book.by_language[language]:
+                related: List[Recipe] = []
+                for related_id in recipe.related_recipes:
+                    if related_id not in book.by_id:
+                        errors.append(LoadException(f"Recipe {recipe.id}.{language} references related recipe {related_id}, but it does not exist"))
+                        continue
+                    if language not in book.by_id[related_id].translations:
+                        errors.append(LoadException(f"Recipe {recipe.id}.{language} references related recipe {related_id}, but it does not support the language {language}"))
+                        continue
+                    related.append(book.by_id[related_id].translations[language])
 
         return book, errors
 
