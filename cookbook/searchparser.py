@@ -39,7 +39,7 @@ class GenericFilter(Filter):
         self.term = term
 
     def passes(self, recipe: Recipe) -> bool:
-        return recipe.has_tag(self.term) or recipe.has_ingredient(self.term) or recipe.has_word(self.term)
+        return recipe.has_tag_approx(self.term) or recipe.has_ingredient_approx(self.term) or recipe.has_word_approx(self.term)
 
     def __repr__(self):
         return f"[Generic: {self.term}]"

@@ -91,7 +91,7 @@ class Recipe:
                  descr: str = None,
                  note: str = None,
                  tags: Union[str, List[str]] = None,
-                 hidden_from_all: bool = False,
+                 hide_from_all: bool = False,
                  related: List[str] = None,
                  prep: List[Dict[str, str]] = None,
                  mis_en_place: List[Dict[str, str]] = None,
@@ -104,7 +104,7 @@ class Recipe:
         self.lang: str = lang
         self.name: str = name
         self.serves: int = serves
-        self.hidden_from_all: bool = hidden_from_all
+        self.hide_from_all: bool = hide_from_all
         self.servings_unit: str = servings_unit
         self.servings_increment: Union[float, int] = servings_increment
         self.descr: Optional[str] = descr
@@ -116,6 +116,9 @@ class Recipe:
             self.word_bag.add(word.lower())
         if descr:
             for word in descr.split():
+                self.word_bag.add(word.lower())
+        if note:
+            for word in note.split():
                 self.word_bag.add(word.lower())
 
         self.total_ingredients: List[Ingredient] = []
@@ -211,11 +214,20 @@ class Recipe:
     def has_ingredient(self, wanted_ingr: str) -> bool:
         return wanted_ingr.lower() in self.ingr_bag
 
+    def has_ingredient_approx(self, wanted_ingr: str) -> bool:
+        return self.has_ingredient(wanted_ingr) or any(difflib.get_close_matches(wanted_ingr.lower(), self.ingr_bag, cutoff=0.8))
+
     def has_tag(self, wanted_tag: str) -> bool:
         return wanted_tag.lower() in self.tags_bag
 
+    def has_tag_approx(self, wanted_tag: str) -> bool:
+        return self.has_tag(wanted_tag) or any(difflib.get_close_matches(wanted_tag.lower(), self.tags_bag, cutoff=0.8))
+
     def has_word(self, wanted_word: str) -> bool:
         return wanted_word.lower() in self.word_bag
+
+    def has_word_approx(self, wanted_word: str) -> bool:
+        return self.has_word(wanted_word) or any(difflib.get_close_matches(wanted_word.lower(), self.word_bag, cutoff=0.8))
 
     def image_path(self) -> str:
         """
