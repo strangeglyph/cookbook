@@ -55,9 +55,9 @@ class RecipeStep:
                     self.ingredients.append(Ingredient(serves, **ingredient))
                 except TypeError as e:
                     if "ingredient" in ingredient and type(ingredient) == map:
-                        ing_id = f"{i} ({ingredient['ingredient']})"
+                        ing_id = f"{i + 1} ({ingredient['ingredient']})"
                     else:
-                        ing_id = f"{i}"
+                        ing_id = f"{i + 1}"
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
                         raise LoadException(f"ingredient {ing_id} is missing a required field: '{field}'")
@@ -146,24 +146,24 @@ class Recipe:
                 update_tag_set(lang, norm_tag)
 
         self.prep: List[RecipeStep] = []
-        self.parse_section(prep, self.prep)
+        self.parse_section("Prep", prep, self.prep)
 
         self.mis_en_place: List[RecipeStep] = []
-        self.parse_section(mis_en_place, self.mis_en_place)
+        self.parse_section("Mis-en-place", mis_en_place, self.mis_en_place)
 
         self.cooking: List[RecipeStep] = []
-        self.parse_section(cooking, self.cooking)
+        self.parse_section("Cooking", cooking, self.cooking)
 
         self.passive_cooking: List[RecipeStep] = []
-        self.parse_section(passive_cooking, self.passive_cooking)
+        self.parse_section("Passive cooking", passive_cooking, self.passive_cooking)
 
         self.cooking2: List[RecipeStep] = []
-        self.parse_section(cooking2, self.cooking2)
+        self.parse_section("Cooking pt. 2", cooking2, self.cooking2)
 
         self.passive_cooking2: List[RecipeStep] = []
-        self.parse_section(passive_cooking2, self.passive_cooking2)
+        self.parse_section("Passive cooking pt. 2", passive_cooking2, self.passive_cooking2)
 
-    def parse_section(self, yaml_section: List[Dict[str, str]], list_section: List[RecipeStep]):
+    def parse_section(self, sec_name: str, yaml_section: List[Dict[str, str]], list_section: List[RecipeStep]):
         if yaml_section is not None:
             for i, step in enumerate(yaml_section):
                 try:
@@ -175,15 +175,15 @@ class Recipe:
                     if e.args and 'required positional argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
                         raise LoadException(
-                            f"Recipe {self.id}.{self.lang}: prep step {i + 1} is missing a required field: '{field}'")
+                            f"Recipe {self.id}.{self.lang}: {sec_name} step {i + 1} is missing a required field: '{field}'")
                     elif e.args and 'unexpected keyword argument' in e.args[0]:
                         field = e.args[0].split('\'')[1]
                         raise LoadException(
-                            f"Recipe {self.id}.{self.lang}: prep step {i + 1} contains an unknown key: '{field}'")
+                            f"Recipe {self.id}.{self.lang}: {sec_name} step {i + 1} contains an unknown key: '{field}'")
                     else:
                         raise e
                 except LoadException as e:
-                    e.args = (f"Recipe {self.id}.{self.lang}: prep step {i + 1}: {e.args[0]}",)
+                    e.args = (f"Recipe {self.id}.{self.lang}: {sec_name} step {i + 1}: {e.args[0]}",)
                     raise e
 
     def merge_ingredient(self, new_ingr: Ingredient):
