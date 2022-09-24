@@ -25,7 +25,7 @@ This means among other things:
 Cookbook is written as a WSGI service. It is recommend to run it via
 [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/), though several other 
 deployment options are available. Please see the 
-[Flask deployment instructions](https://flask.palletsprojects.com/en/2.2.x/tutorial/deploy/)
+[Flask deployment instructions](https://flask.palletsprojects.com/en/2.2.x/deploying/)
 for in-depth information.
 
 Please find example setup scenarios below:
