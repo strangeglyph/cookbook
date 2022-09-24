@@ -24,7 +24,8 @@ This means among other things:
 # <a name="deployment"></a> Deployment
 Cookbook is written as a WSGI service. It is recommend to run it via
 [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/), though several other 
-deployment options are available. Please see the [Flask deployment instructions] 
+deployment options are available. Please see the 
+[Flask deployment instructions](https://flask.palletsprojects.com/en/2.2.x/tutorial/deploy/)
 for in-depth information.
 
 Please find example setup scenarios below:
