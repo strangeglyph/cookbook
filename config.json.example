@@ -1,5 +1,6 @@
 {
   "DEBUG": false,
   "COOKBOOK_LOCATION": "/path/to/recipes",
-  "SECRET_KEY": put something here
+  "SECRET_KEY": put something here,
+  "defaultlang": "en"
 }
