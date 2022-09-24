@@ -99,7 +99,7 @@ class Recipe:
                  passive_cooking: List[Dict[str, str]] = None,
                  cooking2: List[Dict[str, str]] = None,
                  passive_cooking2: List[Dict[str, str]] = None):
-        self.id: str = id.lower().replace(' ', '-')
+        self.id: str = self.normalize_id(id)
         self.unformatted_id: str = id
         self.lang: str = lang
         self.name: str = name
@@ -126,7 +126,7 @@ class Recipe:
 
         self.related_recipes: List[Union[str, Recipe]] = []
         for related in (related or []):
-            self.related_recipes.append(related.lower().replace(' ', '-'))
+            self.related_recipes.append(self.normalize_id(related))
 
         self.tags: List[str] = []
         self.tags_bag: Set[str] = set()
@@ -162,6 +162,9 @@ class Recipe:
 
         self.passive_cooking2: List[RecipeStep] = []
         self.parse_section(passive_cooking2, self.passive_cooking2)
+
+    def normalize_id(self, id):
+        return id.lower().replace(' ', '-')
 
     def parse_section(self, yaml_section: List[Dict[str, str]], list_section: List[RecipeStep]):
         if yaml_section is not None:
