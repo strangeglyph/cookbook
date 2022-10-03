@@ -8,7 +8,7 @@
     <meta property="og:description" content="{{ recipe.descr }}"/>
     {% endif %}
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="{{ recipe.image_path() }}" />
+    <meta property="og:image" content="{{ base_url }}{{ recipe.image_path() }}" />
     <meta property="og:url" content="{{ base_url }}/{{ active_lang }}/recipe/{{ recipe.id }}" />
     <meta property="og:locale" content="{{ active_lang }}" />
     {% for lang in recipe_trans.translations.keys() %}
