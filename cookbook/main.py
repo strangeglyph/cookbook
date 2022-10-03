@@ -1,3 +1,5 @@
+import argparse
+
 import flask
 from flask import Flask, request, g
 import os
@@ -17,11 +19,9 @@ def get_data_path(relpath: str) -> str:
 
 
 app = Flask(__name__, template_folder=get_data_path("Templates"))
-if len(sys.argv) > 1:
-    print(sys.argv)
-    app.config.from_file(sys.argv[1], load=json.load)
-else:
-    app.config.from_file("../config.json", load=json.load)
+if os.getenv("COOKBOOK_CONFIG"):
+    app.config.from_file(os.getenv("COOKBOOK_CONFIG"), load=json.load)
+app.config.from_prefixed_env()
 
 book = Cookbook()
 yaml = YAML()

@@ -1,3 +1,20 @@
+[tool.poetry]
+name = "cookbook"
+version = "0.1.0"
+description = "Flask application to serve recipes"
+authors = ["glyph <mail at strangegly dot ph>"]
+readme = "README.md"
+packages = [{include = "cookbook"}]
+license = "MIT"
+repository = "https://github.com/strangeglyph/cookbook"
+keywords = ["cooking", "recipes", "cookbook"]
+include = ["cookbook/localization/*", "cookbook/static/*", "cookbook/Templates/*"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+flask = "^2.2"
+"ruamel.yaml" = "0.17"
+
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

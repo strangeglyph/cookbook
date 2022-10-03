@@ -1,3 +1,0 @@
-[packages]
-flask = "*"
-ruamel-yaml = "*"

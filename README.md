@@ -72,6 +72,10 @@ In `/var/cookbook/config.json`, put:
 Replace all of these keys as necessary. `SECRET_KEY` should be any randomly
 generated string, see the Flask config for more details. 
 
+If you prefer, you can also set all of these options as environment variables. Simply
+prefix them with `FLASK_` (e.g. `FLASK_COOKBOOK_LOCATION`). If both a config file
+and environment variables are provided, environment variables take precedence.
+
 
 ### uWSGI
 
@@ -95,13 +99,13 @@ In `/var/uwsgi/vassals/cookbook.json`, put
     "chmod-socket": "664",
     "chown-socket": "uwsgi:www-data",
     "env": [
-      "PATH=/usr/local/cookbook/env/bin"
+      "PATH=/usr/local/cookbook/env/bin",
+      "COOKBOOK_CONFIG=/var/cookbook/config.json"
     ],
     "master": true,
     "module": "cookbook:app",
     "plugin": "python3",
     "plugins": ["python3"],
-    "pyargv": "/var/cookbook/config.json",
     "pyhome": "/usr/local/cookbook/env",
     "socket": "/run/uwsgi/cookbook.sock",
     "workers": 5
@@ -110,7 +114,8 @@ In `/var/uwsgi/vassals/cookbook.json`, put
 ```
 
 Change the value of `chown-socket` to the user that runs -- or will run -- the 
-uWSGI service and the group that runs -- or will run -- nginx service.
+uWSGI service and the group that runs -- or will run -- nginx service. In `env`,
+you can also provide configuration keys (see above for details).
 
 Set up a systemd service (if none comes with your distro) to start uwsgi. This
 service should run as the user set in `chown-socket`. Start uwsgi with the option
