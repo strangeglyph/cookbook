@@ -2,5 +2,7 @@
   "DEBUG": false,
   "COOKBOOK_LOCATION": "/path/to/recipes",
   "SECRET_KEY": put something here,
-  "defaultlang": "en"
+  "DEFAULT_LANG": "en",
+  "BASE_URL": "https://example.com",
+  "SITE_NAME": "Cookbook"
 }

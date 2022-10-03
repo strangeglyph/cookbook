@@ -63,7 +63,9 @@ In `/var/cookbook/config.json`, put:
 {
   "COOKBOOK_LOCATION": "/var/cookbook/recipes",
   "SECRET_KEY": "YOUR-SECRET-KEY",
-  "defaultlang": "en"
+  "DEFAULT_LANG": "en",
+  "BASE_URL": "https://your.website.name",
+  "SITE_NAME": "Cookbook"
 }
 ```
 
@@ -252,11 +254,11 @@ The service attempts to serve one localized version of the website for each
 language for which a recipe has been found. The recipe localization itself is
 left up to the user. The website UI is localized with strings taken from 
 `localization/<lang>.yml`. If the language has no localization file, or a 
-localization key is not defined, the service first falls back on the `defaultlang` 
+localization key is not defined, the service first falls back on the `DEFAULT_LANG` 
 language (definable in the config, if undefined defaults to the language
 with the most recipes), and barring that, English.
 
-The default language of the website is `defaultlang`. Specific languages can be
+The default language of the website is `DEFAULT_LANG`. Specific languages can be
 requested by prefixing all paths on the website by the desired language code.
 Additionally, all recipes will link to versions of the same recipe in different
 languages.

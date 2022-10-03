@@ -1,6 +1,23 @@
 {% extends "base.jinja2" %}
 {% block title %}{{ recipe.name }}{% endblock %}
 {% block header %}{{ recipe.name }}{% endblock %}
+{% block meta %}
+    <meta name="description" content="{{ recipe.name }}{% if recipe.descr %} &#8211; {{ recipe.descr }}{% endif %}" />
+    <meta property="og:title" content="{{ recipe.name }}" />
+    {% if recipe.descr %}
+    <meta property="og:description" content="{{ recipe.descr }}"/>
+    {% endif %}
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{ recipe.image_path() }}" />
+    <meta property="og:url" content="{{ base_url }}/{{ active_lang }}/recipe/{{ recipe.id }}" />
+    <meta property="og:locale" content="{{ active_lang }}" />
+    {% for lang in recipe_trans.translations.keys() %}
+    {% if lang != active_lang %}
+    <meta property="og:locale:alternate" content="{{ lang }}" />
+    {% endif %}
+    {% endfor %}
+    <meta property="og:site_name" content="{{ site_name }}"/>
+{% endblock %}
 {% block content %}
     {% include 'header.jinja2' %}
     <style>
