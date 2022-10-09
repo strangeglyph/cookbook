@@ -168,9 +168,12 @@
         }
     </script>
 
-    <div id="recipe">
+    <div id="recipe" itemscope itemtype="https://schema.org/Recipe">
         <span id="recipe-title">{{ recipe.name }}</span>
         <span id="recipe-ingredients-heading">{{ localize("recipe.ingredients.heading") }}</span>
+        {% for tag in recipe.tags %}
+            <meta itemprop="keywords" content="{{ tag }}"/>
+        {% endfor %}
 
         {% if recipe.note %}
         <span id="recipe-note">
@@ -192,12 +195,12 @@
         </span>
         {% endif %}
 
-        <span id="recipe-servings">
+        <span id="recipe-servings" itemprop="recipeYield" itemscope itemtype="https://schema.org/QuantitativeValue">
             {{ localize("recipe.servingshint") }}
             <button onclick="decrement_servings()">-</button>
-            <span id="recipe-servings-amnt">{{ recipe.serves }}</span>
+            <span id="recipe-servings-amnt" itemprop="value">{{ recipe.serves }}</span>
             <button onclick="increment_servings()">+</button>
-            {{ recipe.servings_unit }}
+            {% if recipe.servings_unit %}<span itemprop="unitText">{{ recipe.servings_unit }}</span>{% endif %}
         </span>
         <!--
         <div id="recipe-servings-and-lang">
@@ -209,7 +212,7 @@
             {% for ingr in recipe.total_ingredients %}
                 <span class="ingr-amount any-ingr-amount">{{ ingr.amount|format_num }}</span>
                 <span class="ingr-unit">{% if ingr.unit %}{{ ingr.unit }}{% endif %}</span>
-                <span class="ingr-name">{{ ingr.ingredient }}</span>
+                <span class="ingr-name" itemprop="recipeIngredient">{{ ingr.ingredient }}</span>
             {% endfor %}
         </div>
 
@@ -234,8 +237,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
@@ -259,8 +262,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
@@ -284,8 +287,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
@@ -309,8 +312,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
@@ -334,8 +337,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}
@@ -359,8 +362,8 @@
                     {% set rows.count = rows.count + 1 %}
                 {% endfor %}
             </div>
-            <div class="step-instructions" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
-                {{ step.instructions }}
+            <div class="step-instructions" itemprop="step" itemscope itemtype="https://schema.org/HowToStep" style="grid-row: {{ rows.start }} / span {{ step.rows() }}">
+                <span itemprop="text">{{ step.instructions }}</span>
             </div>
             {% set rows.start = rows.start + step.rows() + 1 %}
         {% endfor %}

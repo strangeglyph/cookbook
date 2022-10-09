@@ -85,8 +85,8 @@ class RecipeStep:
 
 
 class Recipe:
-    def __init__(self, recipe_foler: str, id: str, lang: str, name: str, serves: int,
-                 servings_unit: str = "",
+    def __init__(self, recipe_folder: str, id: str, lang: str, name: str, serves: int,
+                 servings_unit: str = None,
                  servings_increment: Union[float, int] = 1,
                  descr: str = None,
                  note: str = None,
@@ -105,11 +105,11 @@ class Recipe:
         self.name: str = name
         self.serves: int = serves
         self.hide_from_all: bool = hide_from_all
-        self.servings_unit: str = servings_unit
+        self.servings_unit: Optional[str] = servings_unit
         self.servings_increment: Union[float, int] = servings_increment
         self.descr: Optional[str] = descr
         self.note: Optional[str] = note
-        self.recipe_folder: str = recipe_foler
+        self.recipe_folder: str = recipe_folder
         self.word_bag: Set[str] = set()
 
         for word in name.split():
