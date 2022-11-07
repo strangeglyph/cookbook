@@ -42,6 +42,7 @@
 
         <div>
             <a href="/all">{{ localize("main.showall") }}</a>
+            {% if most_common_tags %}
             &nbsp;&mdash;&nbsp;
             {{ localize("main.try-common-tags") }}
             {% for tag in most_common_tags %}
@@ -53,6 +54,7 @@
                     <a href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
                 {% endif %}
             {% endfor %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

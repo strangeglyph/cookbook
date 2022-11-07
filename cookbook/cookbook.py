@@ -338,6 +338,9 @@ class Cookbook:
         return book, errors
 
     def most_common_tags(self, lang, threshold=4):
+        if lang not in self.tagcount_by_language:
+            return []
+
         tag_counts = self.tagcount_by_language[lang]
         sorted_tags = list(map(lambda x: x[0], sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)))
         return sorted_tags[:threshold]

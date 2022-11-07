@@ -186,8 +186,14 @@ if errors:
     for error in errors:
         print(f"- {error.args[0]}")
 
+if not book.by_id:
+    print("I was unable to load any recipes whatsoever.")
+
 if "DEFAULT_LANG" not in app.config:
-    app.config["DEFAULT_LANG"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
+    if not book.by_language:
+        app.config["DEFAULT_LANG"] = "en"
+    else:
+        app.config["DEFAULT_LANG"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
 
 if "SITE_NAME" not in app.config:
     app.config["SITE_NAME"] = "Cookbook"
