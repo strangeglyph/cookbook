@@ -85,8 +85,8 @@ class RecipeStep:
 
 
 class Recipe:
-    def __init__(self, recipe_foler: str, id: str, lang: str, name: str, serves: int,
-                 servings_unit: str = "",
+    def __init__(self, recipe_folder: str, id: str, lang: str, name: str, serves: int,
+                 servings_unit: str = None,
                  servings_increment: Union[float, int] = 1,
                  descr: str = None,
                  note: str = None,
@@ -99,17 +99,17 @@ class Recipe:
                  passive_cooking: List[Dict[str, str]] = None,
                  cooking2: List[Dict[str, str]] = None,
                  passive_cooking2: List[Dict[str, str]] = None):
-        self.id: str = id.lower().replace(' ', '-')
+        self.id: str = self.normalize_id(id)
         self.unformatted_id: str = id
         self.lang: str = lang
         self.name: str = name
         self.serves: int = serves
         self.hide_from_all: bool = hide_from_all
-        self.servings_unit: str = servings_unit
+        self.servings_unit: Optional[str] = servings_unit
         self.servings_increment: Union[float, int] = servings_increment
         self.descr: Optional[str] = descr
         self.note: Optional[str] = note
-        self.recipe_folder: str = recipe_foler
+        self.recipe_folder: str = recipe_folder
         self.word_bag: Set[str] = set()
 
         for word in name.split():
@@ -126,7 +126,7 @@ class Recipe:
 
         self.related_recipes: List[Union[str, Recipe]] = []
         for related in (related or []):
-            self.related_recipes.append(related.lower().replace(' ', '-'))
+            self.related_recipes.append(self.normalize_id(related))
 
         self.tags: List[str] = []
         self.tags_bag: Set[str] = set()
@@ -162,6 +162,9 @@ class Recipe:
 
         self.passive_cooking2: List[RecipeStep] = []
         self.parse_section("Passive cooking pt. 2", passive_cooking2, self.passive_cooking2)
+
+    def normalize_id(self, id):
+        return id.lower().replace(' ', '-')
 
     def parse_section(self, sec_name: str, yaml_section: List[Dict[str, str]], list_section: List[RecipeStep]):
         if yaml_section is not None:
@@ -335,6 +338,9 @@ class Cookbook:
         return book, errors
 
     def most_common_tags(self, lang, threshold=4):
+        if lang not in self.tagcount_by_language:
+            return []
+
         tag_counts = self.tagcount_by_language[lang]
         sorted_tags = list(map(lambda x: x[0], sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)))
         return sorted_tags[:threshold]

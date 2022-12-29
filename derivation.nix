@@ -18,6 +18,6 @@ pkgs.python3Packages.buildPythonPackage rec {
     meta = with lib; {
         homepage = "https://github.com/strangeglyph/cookbook";
         description = "Flask application to serve recipes";
-        license = licenses.asl20;
+        license = licenses.mit;
     };
 }

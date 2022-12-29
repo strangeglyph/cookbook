@@ -1,3 +1,5 @@
+import argparse
+
 import flask
 from flask import Flask, request, g
 import os
@@ -17,11 +19,9 @@ def get_data_path(relpath: str) -> str:
 
 
 app = Flask(__name__, template_folder=get_data_path("Templates"))
-if len(sys.argv) > 1:
-    print(sys.argv)
-    app.config.from_json(sys.argv[1])
-else:
-    app.config.from_json("../config.json")
+if os.getenv("COOKBOOK_CONFIG"):
+    app.config.from_file(os.getenv("COOKBOOK_CONFIG"), load=json.load)
+app.config.from_prefixed_env()
 
 book = Cookbook()
 yaml = YAML()
@@ -43,7 +43,7 @@ def lang():
     if 'lang' in request.cookies:
         return request.cookies.get('lang')
 
-    return app.config["defaultlang"]
+    return app.config["DEFAULT_LANG"]
 
 
 @app.url_defaults
@@ -69,6 +69,11 @@ def pull_lang(endpoint, values):
 @app.context_processor
 def inject_language_stuff():
     return dict(active_lang=lang(), localize=localize)
+
+
+@app.context_processor
+def inject_site_info():
+    return dict(site_name=app.config["SITE_NAME"], base_url=app.config["BASE_URL"])
 
 
 @app.route('/')
@@ -117,8 +122,8 @@ def recipe(recipe_id: str):
     recipe_trans = book.by_id[recipe_id]
     if lang() in recipe_trans.translations:
         recipe = recipe_trans.translations[lang()]
-    elif app.config["defaultlang"] in recipe_trans.translations:
-        recipe = recipe_trans.translations[app.config["defaultlang"]]
+    elif app.config["DEFAULT_LANG"] in recipe_trans.translations:
+        recipe = recipe_trans.translations[app.config["DEFAULT_LANG"]]
     else:
         recipe = next(recipe_trans.translations.values())
 
@@ -164,8 +169,8 @@ def mapnone(xs, val):
 def localize(string):
     if lang() in LOC_FILES and string in LOC_FILES[lang()]:
         return LOC_FILES[lang()][string]
-    elif app.config['defaultlang'] in LOC_FILES and string in LOC_FILES[app.config['defaultlang']]:
-        return LOC_FILES[app.config['defaultlang']][string]
+    elif app.config['DEFAULT_LANG'] in LOC_FILES and string in LOC_FILES[app.config['DEFAULT_LANG']]:
+        return LOC_FILES[app.config['DEFAULT_LANG']][string]
     elif string in LOC_FILES['en']:
         return LOC_FILES['en'][string]
     else:
@@ -181,6 +186,18 @@ if errors:
     for error in errors:
         print(f"- {error.args[0]}")
 
-if "defaultlang" not in app.config:
-    app.config["defaultlang"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
+if not book.by_id:
+    print("I was unable to load any recipes whatsoever.")
 
+if "DEFAULT_LANG" not in app.config:
+    if not book.by_language:
+        app.config["DEFAULT_LANG"] = "en"
+    else:
+        app.config["DEFAULT_LANG"] = max(book.by_language.keys(), key=(lambda k: len(book.by_language[k])))
+
+if "SITE_NAME" not in app.config:
+    app.config["SITE_NAME"] = "Cookbook"
+
+if "BASE_URL" not in app.config:
+    print(app.config)
+    raise Exception("No BASE_URL in app config")

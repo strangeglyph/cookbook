@@ -1,17 +1,31 @@
 {% extends "base.jinja2" %}
 {% block title %}Cookbook{% endblock %}
 {% block header %}Cookbook{% endblock %}
+{% block meta %}
+    <meta name="description" content="{% if query %}Cookbook results for {{ query }}{% else %}Cookbook recipe listing{% endif %}" />
+    <meta property="og:title" content="{{ site_name }}" />
+    <meta property="og:description" content="{% if query %}Cookbook results for {{ query }}{% else %}Cookbook recipe listing{% endif %}"/>
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{ base_url }}/static/logo.svg" />
+    <meta property="og:url" content="{{ base_url }}/{{ active_lang }}/{% if query %}search?q={{ query|urlencode }}{% else %}/all{% endif %}" />
+    <meta property="og:locale" content="{{ active_lang }}" />
+    <meta property="og:site_name" content="{{ site_name }}"/>
+{% endblock %}
 {% block content %}
     {% include 'header.jinja2' %}
 
-    <div id="results">
+    <div id="results" itemscope itemtype="https://schema.org/ItemList">
+        <meta itemprop="numberOfItems" content="{{ results.__len__() }}"/>
         {% if not results %}
             No recipes found!
         {% else %}
             {% for recipe in results %}
-                <div class="result">
+                <div class="result" itemprop="itemListElement" itemscope itemtype="https://schema.org/Thing">
                     <a class="result-image" href="/recipe/{{ recipe.id | urlencode }}"><img alt="An image of {{ recipe.name | escape }}" src="{{ recipe.image_path() }}"></a>
-                    <a class="result-name" href="/recipe/{{ recipe.id | urlencode }}">{{ recipe.name }}</a>
+                    <meta itemprop="image" content="{{ base_url }}{{ recipe.image_path() }}" />
+                    <a class="result-name" href="/{{ active_lang }}/recipe/{{ recipe.id | urlencode }}"><span itemprop="name">{{ recipe.name }}</span></a>
+                    <meta itemprop="url" content="{{ base_url }}/{{ active_lang }}/recipe/{{ recipe.id | urlencode }}" />
+                    <span class="result-description" itemprop="description">{% if recipe.descr %}{{ recipe.descr }}{% endif %}</span>
                     <span class="result-tags">
                     {% for tag in recipe.tags %}
                         {% if loop.index0 != 0 %}, {% endif %}
