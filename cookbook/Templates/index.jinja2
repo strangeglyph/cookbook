@@ -30,9 +30,24 @@
         {% endif %}
         </div>
 
-        <div>
+        <div id="index-helpful-links-large">
             <a href="/all">{{ localize("main.showall") }}</a>
             &nbsp;&mdash;&nbsp;
+            {{ localize("main.try-common-tags") }}
+            {% for tag in most_common_tags %}
+                {% if loop.index0 != 0 %}&middot;{% endif %}
+
+                {% if lang == active_lang %}
+                    {{ lang }}
+                {% else %}
+                    <a href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div id="index-helpful-links-small">
+            <a href="/all">{{ localize("main.showall") }}</a>
+            <hr />
             {{ localize("main.try-common-tags") }}
             {% for tag in most_common_tags %}
                 {% if loop.index0 != 0 %}&middot;{% endif %}

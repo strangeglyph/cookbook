@@ -1,0 +1,275 @@
+@media only screen and (width > 600px) {
+
+    #recipe {
+        display: grid;
+        width: min(60em, 90vw);
+        grid-template-columns: 100%;
+        column-gap: 1em;
+    }
+
+    #recipe-title {
+        font-size: 4rem;
+        text-align: center;
+        grid-row: 1;
+    }
+
+    #recipe-note {
+        font-style: italic;
+        grid-row: 2;
+    }
+
+    #recipe-lang {
+        justify-self: right;
+        padding-right: 1em;
+        padding-left: 3em;
+        padding-top: 2em;
+        grid-row: 3;
+    }
+
+    #recipe-servings {
+        justify-self: right;
+        padding-right: 1em;
+        grid-row: 4;
+    }
+
+    #recipe-ingredients-container {
+        grid-row: 5;
+        display: grid;
+        padding-top: 2em;
+        grid-template-columns: 33% 66%;
+        width: 100%;
+    }
+
+    #recipe-ingredients-heading {
+        grid-column: 1;
+        text-align: right;
+        font-style: italic;
+        margin-right: 1em;
+    }
+
+    #recipe-ingredients {
+        grid-column: 2;
+        display: grid;
+        grid-template-columns: [ingr-amnt] max-content .5em [ingr-unit] max-content 1.5em [ingr-name] auto [end];
+        grid-auto-rows: auto;
+        border-left: 1px solid #7f7f7f;
+        padding-left: 1em;
+    }
+
+    .ingr-amount {
+        grid-column: ingr-amnt / span 1;
+        text-align: right;
+    }
+
+    .ingr-unit {
+        grid-column: ingr-unit / span 1;
+    }
+
+    .ingr-name {
+        grid-column: ingr-name / span 1;
+    }
+
+
+    .recipe-section {
+        display: grid;
+        margin-top: 3em;
+        width: 100%;
+    }
+
+    #prep {
+        grid-row: 6;
+    }
+
+     #misenplace {
+        grid-row: 7;
+    }
+
+    #cooking {
+        grid-row: 8;
+    }
+
+    #passivecooking {
+        grid-row: 9;
+    }
+
+    #cooking2 {
+        grid-row: 10;
+    }
+
+    #passivecooking2 {
+        grid-row: 11;
+    }
+
+    .recipe-section-heading {
+        font-size: larger;
+        text-align: center;
+        justify-self: center;
+        grid-row: 1;
+    }
+
+    .step {
+        display: grid;
+        grid-template-columns: [ingr] 33% [instructions] 66%;
+        margin-top: 1.5em;
+        width: 100%;
+    }
+
+    .step-ingredients {
+        margin-right: 1em;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-auto-rows: min-content;
+    }
+
+    .step-ingr-hint {
+        grid-column: 1;
+        justify-self: right;
+        font-style: italic;
+        font-size: smaller;
+    }
+
+    .step-instructions {
+        grid-column: 2;
+        border-left: 1px solid #7f7f7f;
+        padding-left: 1em;
+        min-height: 3em;
+        padding-top: .25em;
+        padding-bottom: .25em;
+        margin-top: .25em;
+        margin-bottom: .25em;
+    }
+}
+
+@media only screen and (width <= 600px) {
+    #recipe {
+        display: grid;
+        width: 90vw;
+        grid-template-columns: 100%;
+        column-gap: 1em;
+        padding-bottom: 4em;
+    }
+
+    #recipe-title {
+        font-size: 2rem;
+        text-align: center;
+        grid-row: 1;
+    }
+
+    #recipe-note {
+        font-style: italic;
+        grid-row: 2;
+    }
+
+    #recipe-lang {
+        justify-self: right;
+        grid-row: 3;
+        padding-top: 1em;
+    }
+
+    #recipe-servings {
+        justify-self: right;
+        grid-row: 4;
+    }
+
+    #recipe-ingredients-container {
+        grid-row: 5;
+        padding-top: 2em;
+        display: grid;
+        grid-template-columns: 100%;
+    }
+
+    #recipe-ingredients-heading {
+        text-align: center;
+        font-style: italic;
+        grid-row: 1;
+    }
+
+    #recipe-ingredients {
+        grid-row: 2;
+        display: grid;
+        grid-template-columns: [ingr-amnt] max-content .5em [ingr-unit] max-content 1.5em [ingr-name] auto [end];
+        grid-auto-rows: auto;
+        justify-self: center;
+    }
+
+    .ingr-amount {
+        grid-column: ingr-amnt / span 1;
+        text-align: right;
+    }
+
+    .ingr-unit {
+        grid-column: ingr-unit / span 1;
+    }
+
+    .ingr-name {
+        grid-column: ingr-name / span 1;
+    }
+
+    .recipe-section {
+        display: grid;
+        margin-top: 3em;
+    }
+
+    #prep {
+        grid-row: 6;
+    }
+
+    #misenplace {
+        grid-row: 7;
+    }
+
+    #cooking {
+        grid-row: 8;
+    }
+
+    #passivecooking {
+        grid-row: 9;
+    }
+
+    #cooking2 {
+        grid-row: 10;
+    }
+
+    #passivecooking2 {
+        grid-row: 11;
+    }
+
+    .recipe-section-heading {
+        font-size: larger;
+        text-align: center;
+        justify-self: center;
+        grid-row: 1;
+    }
+
+    .step {
+        display: grid;
+        grid-template-rows: [ingr] auto [instructions] auto;
+        margin-top: 1.5em;
+    }
+
+    .step-ingredients {
+        grid-row: ingr;
+        display: flex;
+        flex-flow: wrap;
+        justify-content: center;
+        column-gap: 1.5em;
+
+        font-style: italic;
+        font-size: smaller;
+    }
+
+    .step-ingr-hint {
+        grid-column: ingr-hint-begin / ingr-hint-end;
+        text-align: right;
+    }
+
+    .step-instructions:before {
+        border: 1px solid #b3b3b3;
+        align-self: stretch;
+    }
+
+    .step-instructions {
+        grid-row: instructions;
+        margin-top: .5em;
+    }
+}

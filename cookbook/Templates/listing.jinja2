@@ -12,7 +12,6 @@
                 <div class="result">
                     <a class="result-image" href="/recipe/{{ recipe.id | urlencode }}"><img alt="An image of {{ recipe.name | escape }}" src="{{ recipe.image_path() }}"></a>
                     <a class="result-name" href="/recipe/{{ recipe.id | urlencode }}">{{ recipe.name }}</a>
-                    <span class="result-description">{% if recipe.descr %}{{ recipe.descr }}{% endif %}</span>
                     <span class="result-tags">
                     {% for tag in recipe.tags %}
                         {% if loop.index0 != 0 %}, {% endif %}

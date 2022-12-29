@@ -2,7 +2,9 @@ recipe.ingredients.heading: Ingredients
 recipe.section.prep.heading: Prep
 recipe.section.misenplace.heading: Mis-En-Place
 recipe.section.cooking.heading: Assembly
+recipe.section.cooking2.heading: Assembly
 recipe.section.passivecooking.heading: Cooking
+recipe.section.passivecooking2.heading: Cooking
 recipe.languagehint: "Other languages:"
 recipe.servingshint: "Servings:"
 searchbar.hint: Recipe name, tags, ...

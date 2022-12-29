@@ -19,9 +19,9 @@ def get_data_path(relpath: str) -> str:
 app = Flask(__name__, template_folder=get_data_path("Templates"))
 if len(sys.argv) > 1:
     print(sys.argv)
-    app.config.from_file(sys.argv[1], load=json.load)
+    app.config.from_json(sys.argv[1])
 else:
-    app.config.from_file("../config.json", load=json.load)
+    app.config.from_json("../config.json")
 
 book = Cookbook()
 yaml = YAML()
@@ -101,7 +101,7 @@ def search():
 @app.route("/all")
 @app.route("/<lang>/all")
 def all():
-    all_except_hidden = filter(lambda recipe: not recipe.hidden_from_all, book.by_language[lang()])
+    all_except_hidden = filter(lambda recipe: not recipe.hide_from_all, book.by_language[lang()])
     results = sorted(all_except_hidden, key=lambda r: r.name)
     g.response.data = flask.render_template('listing.jinja2', results=results)
     return g.response

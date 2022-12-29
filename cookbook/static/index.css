@@ -1,0 +1,62 @@
+#logo-big-container {
+    margin-top: 7vh;
+}
+
+#logo-big {
+    height: 26vh;
+}
+
+#search {
+    margin-top: 7vh;
+    height: 100%;
+}
+
+#search-form {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#search-bar {
+    font-size: 2em;
+    height: 4rem;
+    width: 48rem;
+    padding-left: .5em;
+    padding-right: .5em;
+    box-shadow: 0 4px 8px;
+}
+
+@media only screen and (max-width: 50rem) {
+    #search-bar {
+        font-size: 1.5em;
+        height: 3rem;
+        width: 80vw;
+    }
+
+    #index-helpful-links-large {
+        display: none;
+    }
+
+    #index-helpful-links-small {
+        display: block;
+        text-align: center;
+        margin: 2em 1em 1em;
+    }
+}
+
+@media only screen and (min-width: 50rem) {
+    #index-helpful-links-small {
+        display: none;
+    }
+}
+
+
+
+#nav {
+    margin-top: 1em;
+}
+
+#index-lang {
+    text-align: center;
+}

@@ -1,0 +1,49 @@
+#results {
+    display: grid;
+    grid-template-areas: "a";
+    grid-gap: 4em;
+}
+
+.result {
+    width: min(30em, 90vw);
+    display: grid;
+    grid-template-rows: [top] auto [title] auto [tags] auto [bottom];
+    grid-template-columns: [left] auto [end];
+    grid-gap: 1em;
+}
+
+.result-image {
+    grid-row: top / span 1;
+    grid-column: left / span 1;
+}
+
+.result-image > img {
+    width: 100%;
+    height: auto;
+}
+
+.result-name {
+    grid-row: title / span 1;
+    grid-column: left / span 1;
+    font-weight: bold;
+    color: inherit;
+    text-decoration: none;
+    font-size: larger;
+    justify-self: center;
+}
+
+.result-tags {
+    grid-row: tags / span 1;
+    grid-column: left / span 1;
+    font-size: smaller;
+    font-style: italic;
+    justify-self: center;
+}
+
+a.result-tag {
+    color: #6f6f7f;
+}
+
+a:visited.result-tag {
+    color: #6f6f7f;
+}

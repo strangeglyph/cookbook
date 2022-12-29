@@ -1,0 +1,28 @@
+body {
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    margin: auto;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+
+#content {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+#footer {
+    position: fixed;
+    bottom: 0;
+    margin-left: .5em;
+    margin-bottom: .5em;
+    border-top: 5px darkgray;
+    font-size: 10pt;
+}
+
+#footer a {
+    color: #6f6f6f;
+}
+
