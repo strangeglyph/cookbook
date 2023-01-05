@@ -13,10 +13,10 @@
 {% endblock %}
 {% block content %}
     <div id="logo-big-container">
-        <img id="logo-big" src="/static/logo.svg" alt="Cookbook">
+        <img id="logo-big" src="{{ root }}/static/logo.svg" alt="Cookbook">
     </div>
     <div id="search">
-        <form id="search-form" role="search" action="/{{ active_lang }}/search">
+        <form id="search-form" role="search" action="{{ root }}/{{ active_lang }}/search">
             <input id="search-bar"
                    type="text"
                    name="query"
@@ -34,14 +34,14 @@
             {% if lang == active_lang %}
                 {{ lang }}
             {% else %}
-                <a href="/{{ lang }}/">{{ lang }}</a>
+                <a href="{{ root }}/{{ lang }}/">{{ lang }}</a>
             {% endif %}
         {% endfor %}
         {% endif %}
         </div>
 
         <div id="index-helpful-links-large">
-            <a href="/all">{{ localize("main.showall") }}</a>
+            <a href="{{ root }}/{{ active_lang }}/all">{{ localize("main.showall") }}</a>
             {% if most_common_tags %}
             &nbsp;&mdash;&nbsp;
             {{ localize("main.try-common-tags") }}
@@ -51,14 +51,14 @@
                 {% if lang == active_lang %}
                     {{ lang }}
                 {% else %}
-                    <a href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
+                    <a href="{{ root }}/{{ active_lang }}/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
                 {% endif %}
             {% endfor %}
             {% endif %}
         </div>
 
         <div id="index-helpful-links-small">
-            <a href="/all">{{ localize("main.showall") }}</a>
+            <a href="{{ root }}/{{ active_lang }}/all">{{ localize("main.showall") }}</a>
             <hr />
             {{ localize("main.try-common-tags") }}
             {% for tag in most_common_tags %}
@@ -67,7 +67,7 @@
                 {% if lang == active_lang %}
                     {{ lang }}
                 {% else %}
-                    <a href="/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
+                    <a href="{{ root }}/{{ active_lang }}/search?query=tag%3A'{{ tag }}'">{{ tag }}</a>
                 {% endif %}
             {% endfor %}
         </div>

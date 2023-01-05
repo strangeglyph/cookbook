@@ -1,8 +1,8 @@
 <div id="header">
     <div id="logo-small-container">
-        <a href="/"><img id="logo-small" src="/static/logo.svg" alt="Cookbook"></a>
+        <a href="{{ root }}/"><img id="logo-small" src="{{ root }}/static/logo.svg" alt="Cookbook"></a>
     </div>
-    <form id="header-search-form" role="search" action="/search">
+    <form id="header-search-form" role="search" action="{{ root }}/{{ active_lang }}/search">
         <input id="header-search-bar"
                type="text"
                name="query"

@@ -239,15 +239,15 @@ class Recipe:
         replaced with dashes)
         """
         if os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.unformatted_id}.png")):
-            return f"/images/{self.unformatted_id}.png"
+            return f"images/{self.unformatted_id}.png"
         elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.unformatted_id}.jpg")):
-            return f"/images/{self.unformatted_id}.jpg"
+            return f"images/{self.unformatted_id}.jpg"
         elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.id}.png")):
-            return f"/images/{self.id}.png"
+            return f"images/{self.id}.png"
         elif os.path.exists(os.path.join(self.recipe_folder, "images", f"{self.id}.jpg")):
-            return f"/images/{self.id}.jpg"
+            return f"images/{self.id}.jpg"
         else:
-            return "/static/no-image.png"
+            return "static/no-image.png"
 
     @staticmethod
     def split_path(path: str) -> (str, str):

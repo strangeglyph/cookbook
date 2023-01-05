@@ -2,6 +2,7 @@
 * [About This Project](#about)
 * [Deployment](#deployment)
   * [uWSGI and nginx](#deploy-uwsgi-nginx)
+    * [Deploying in Subfolders](#deploy-subfolder) 
   * [Nix](#deploy-nix)
 * [Writing Recipes](#writing-recipes)
   * [Images](#images)
@@ -22,7 +23,7 @@ This means among other things:
 (TODO images)
 
 # <a name="deployment"></a> Deployment
-Cookbook is written as a WSGI service. It is recommend to run it via
+Cookbook is written as a WSGI service. It is recommended to run it via
 [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/), though several other 
 deployment options are available. Please see the 
 [Flask deployment instructions](https://flask.palletsprojects.com/en/2.2.x/deploying/)
@@ -173,6 +174,17 @@ systemctl start nginx
 
 Navigate to the URL set in `server_name` to verify that cookbook is deployed and
 running.
+
+### <a name="deploy-subfolder"></a> Deploying in Subfolders
+While the default setup of Cookbook assumes that it is deployed at the top-level 
+of a webserver, it is possible to host it in a subfolder.
+
+To this end:
+
+* Make sure that BASE_URL in the configuration file contains the full path to Cookbook's index (e.g. `https://example.com/cookbook/`)
+* Add the configuration key `APPLICATION_ROOT` specifiying the subfolder (e.g. `/cookbook/`)
+* Prefix the three locations in the nginx config with the subfolder (e.g. `location /cookbook/ { ... }`, 
+  `location /cookbook/images/ { ... }` and `location /cookbook/static/ { ... }`)
 
 ## <a name="deploy-nix"></a> Nix
 
