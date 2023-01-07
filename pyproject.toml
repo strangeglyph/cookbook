@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cookbook"
-version = "0.1.0"
+version = "1.0.0"
 description = "Flask application to serve recipes"
 authors = ["glyph <mail at strangegly dot ph>"]
 readme = "README.md"
