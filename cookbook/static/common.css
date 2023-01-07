@@ -16,6 +16,7 @@ body {
 #footer {
     position: fixed;
     bottom: 0;
+    left: 0;
     margin-left: .5em;
     margin-bottom: .5em;
     border-top: 5px darkgray;
