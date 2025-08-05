@@ -2,7 +2,7 @@
 
 pkgs.python3Packages.buildPythonPackage rec {
     pname = "cookbook";
-    version = "0.1.0";
+    version = "0.1.1";
     src = ./.;
 
     propagatedBuildInputs = with pkgs.python3Packages; [ flask ruamel-yaml ];
