@@ -22,6 +22,9 @@ app = Flask(__name__, template_folder=get_data_path("Templates"))
 if os.getenv("COOKBOOK_CONFIG"):
     print(f"Loading config from {os.getenv('COOKBOOK_CONFIG')}")
     app.config.from_file(os.getenv("COOKBOOK_CONFIG"), load=json.load)
+if os.getenv("EXTRA_COOKBOOK_CONFIG"): # for secrets
+    print(f"Loading config from {os.getenv('EXTRA_COOKBOOK_CONFIG')}")
+    app.config.from_file(os.getenv("EXTRA_COOKBOOK_CONFIG"), load=json.load)
 app.config.from_prefixed_env()
 
 book = Cookbook()
@@ -210,3 +213,4 @@ if "SITE_NAME" not in app.config:
 
 if "BASE_URL" not in app.config:
     raise Exception("No BASE_URL in app config")
+
