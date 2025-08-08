@@ -7,7 +7,7 @@
                type="text"
                name="query"
                aria-label="{% if query %}{{ query | escape }}{% else %}{{ localize("searchbar.hint") }}{% endif %}"
-               placeholder="{% if query %}{{ query | escape }}{% else %}{{ localize("searchbar.hint") }}{% endif %}">
+               value="{% if query %}{{ query | escape }}{% else %}{{ localize("searchbar.hint") }}{% endif %}">
         <input type="submit" value="&#x1F50D;" hidden>
     </form>
 </div>
