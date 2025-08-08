@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="cookbook",
-    version="0.1.0",
+    version="0.2.0",
     description="Flask application to serve recipes",
     license="MIT",
     author="glyph",
