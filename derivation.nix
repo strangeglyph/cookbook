@@ -7,6 +7,9 @@ pkgs.python3Packages.buildPythonPackage rec {
 
     propagatedBuildInputs = with pkgs.python3Packages; [ flask ruamel-yaml ];
 
+    pyproject = true;
+    buildSystem = with pkgs.python3Packages; [ setuptools ];
+
     pythonImportsCheck = [ "flask" "ruamel.yaml" ];
     doCheck = false;
 
