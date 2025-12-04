@@ -6,7 +6,7 @@ pkgs.python3Packages.buildPythonPackage rec {
     src = ./.;
 
     propagatedBuildInputs = with pkgs.python3Packages; [ flask ruamel-yaml ];
-    nativeBuildInputs = with pkgs.python3Package; [ poetry-core ];
+    nativeBuildInputs = with pkgs.python3Packages; [ poetry-core ];
 
     pyproject = true;
     buildSystem = with pkgs.python3Packages; [ poetry-core ];
