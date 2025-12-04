@@ -13,7 +13,7 @@ include = ["cookbook/localization/*", "cookbook/static/*", "cookbook/Templates/*
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "^3.1"
-"ruamel.yaml" = "0.18"
+"ruamel.yaml" = "^0.18"
 
 [build-system]
 requires = ["poetry-core"]
