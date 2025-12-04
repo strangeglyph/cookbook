@@ -6,9 +6,10 @@ pkgs.python3Packages.buildPythonPackage rec {
     src = ./.;
 
     propagatedBuildInputs = with pkgs.python3Packages; [ flask ruamel-yaml ];
+    nativeBuildInputs = with pkgs.python3Package; [ poetry-core ];
 
     pyproject = true;
-    buildSystem = with pkgs.python3Packages; [ setuptools ];
+    buildSystem = with pkgs.python3Packages; [ poetry-core ];
 
     pythonImportsCheck = [ "flask" "ruamel.yaml" ];
     doCheck = false;
