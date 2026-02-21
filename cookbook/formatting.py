@@ -54,3 +54,15 @@ def round_approximate(num: float) -> int:
 
 def round_up(num: float) -> int:
     return math.ceil(num)
+
+
+def format_instr_part(value):
+    print("Formatting instr part ", value)
+    from .cookbook.recipev2 import Scalar
+    if type(value) == Scalar:
+        return (f'<span class="scalar">'
+                f'<span class="scalar-amt">{format_num(value.amount)}</span>'
+                f'<span class="scalar-per-serving">{value.amount_per_serving}</span>'
+                f'</span>')
+    else:
+        return f'<span class="instr-part">{value}</span>'

@@ -7,15 +7,12 @@ import os.path
 import sys
 import json
 
-from ruamel.yaml import YAML
 
-from cookbook import formatting
-from cookbook import searchparser
-from cookbook.cookbook import Cookbook
-
-
-def get_data_path(relpath: str) -> str:
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relpath)
+from . import localization
+from . import formatting
+from . import searchparser
+from .common import get_data_path
+from .cookbook.cookbook import Cookbook
 
 
 app = Flask(__name__, template_folder=get_data_path("Templates"))
@@ -26,19 +23,6 @@ if os.getenv("EXTRA_COOKBOOK_CONFIG"): # for secrets
     print(f"Loading config from {os.getenv('EXTRA_COOKBOOK_CONFIG')}")
     app.config.from_file(os.getenv("EXTRA_COOKBOOK_CONFIG"), load=json.load)
 app.config.from_prefixed_env()
-
-book = Cookbook()
-yaml = YAML()
-
-LOC_FILES = {}
-for file in os.listdir(get_data_path("localization")):
-    if os.path.splitext(file)[1] == '.yml':
-        lang = os.path.splitext(file)[0]
-        print(f"Loading localization file for {lang}")
-        loc_file_path = os.path.join(get_data_path("localization"), file)
-        with open(loc_file_path) as loc_file:
-            LOC_FILES[lang] = yaml.load(loc_file)
-
 
 def lang():
     if hasattr(g, "lang_code") and g.lang_code:
@@ -85,6 +69,10 @@ def inject_site_info():
         root = ""
     return dict(site_name=app.config["SITE_NAME"], base_url=app.config["BASE_URL"], root=root)
 
+@app.context_processor
+def inject_cookbook():
+    return dict(book=book)
+
 
 @app.route('/')
 @app.route('/<lang>/')
@@ -116,8 +104,8 @@ def search():
 @app.route("/all")
 @app.route("/<lang>/all")
 def all():
-    all_except_hidden = filter(lambda recipe: not recipe.hide_from_all, book.by_language[lang()])
-    results = sorted(all_except_hidden, key=lambda r: r.name)
+    all_except_hidden = filter(lambda recipe: not recipe.metadata.hide_from_all, book.by_language[lang()])
+    results = sorted(all_except_hidden, key=lambda r: r.metadata.name)
     g.response.data = flask.render_template('listing.jinja2', results=results)
     return g.response
 
@@ -155,6 +143,9 @@ def format_num(value):
     except ValueError:
         return value
 
+@app.template_filter()
+def format_instr_part(value):
+    return formatting.format_instr_part(value)
 
 @app.template_filter()
 def round_up(value):
@@ -177,14 +168,13 @@ def mapnone(xs, val):
 
 
 def localize(string):
-    if lang() in LOC_FILES and string in LOC_FILES[lang()]:
-        return LOC_FILES[lang()][string]
-    elif app.config['DEFAULT_LANG'] in LOC_FILES and string in LOC_FILES[app.config['DEFAULT_LANG']]:
-        return LOC_FILES[app.config['DEFAULT_LANG']][string]
-    elif string in LOC_FILES['en']:
-        return LOC_FILES['en'][string]
-    else:
-        return string
+    if localization.is_localized(string, lang()):
+        return localization.localize(string, lang())
+
+    if localization.is_localized(string, app.config['DEFAULT_LANG']):
+        return localization.localize(string, app.config['DEFAULT_LANG'])
+
+    return localization.localize(string, 'en')
 
 
 if "COOKBOOK_LOCATION" not in app.config:
@@ -194,8 +184,9 @@ book, errors = Cookbook.load_folder(app.config["COOKBOOK_LOCATION"])
 print(f"Cookbook: {len(book.by_id)} recipes loaded (path: {app.config['COOKBOOK_LOCATION']})")
 for language, collection in book.by_language.items():
     print(f"- {language}: {len(collection)}")
+
 if errors:
-    print("The following errors occurred while trying to load recipes (These recipes will be ignored):")
+    print("The following errors occurred while trying to load recipes (These recipes may be ignored):")
     for error in errors:
         print(f"- {error.args[0]}")
 

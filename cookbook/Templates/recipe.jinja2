@@ -2,14 +2,14 @@
 {% block title %}{{ recipe.name }}{% endblock %}
 {% block header %}{{ recipe.name }}{% endblock %}
 {% block meta %}
-    <meta name="description" content="{{ recipe.name }}{% if recipe.descr %} &#8211; {{ recipe.descr }}{% endif %}" />
+    <meta name="description" content="{{ recipe.name }}{% if recipe.metadata.desc %} &#8211; {{ recipe.metadata.desc }}{% endif %}" />
     <meta property="og:title" content="{{ recipe.name }}" />
-    {% if recipe.descr %}
-    <meta property="og:description" content="{{ recipe.descr }}"/>
+    {% if recipe.metadata.desc %}
+    <meta property="og:description" content="{{ recipe.metadata.desc }}"/>
     {% endif %}
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="{{ base_url }}/{{ recipe.image_path() }}" />
-    <meta property="og:url" content="{{ base_url }}/{{ active_lang }}/recipe/{{ recipe.id }}" />
+    <meta property="og:image" content="{{ base_url }}/{{ book.image_path(recipe) }}" />
+    <meta property="og:url" content="{{ base_url }}/{{ active_lang }}/recipe/{{ recipe.metadata.id }}" />
     <meta property="og:locale" content="{{ active_lang }}" />
     {% for lang in recipe_trans.translations.keys() %}
     {% if lang != active_lang %}
@@ -21,14 +21,6 @@
 {% block content %}
     {% include 'header.jinja2' %}
     <script>
-        total_per_serving = {{
-            (recipe.total_ingredients|map(attribute='amount_per_serving')|list
-            + recipe.prep|flatmap('ingredients')|map(attribute='amount_per_serving')|list
-            + recipe.mis_en_place|flatmap('ingredients')|map(attribute='amount_per_serving')|list
-            + recipe.cooking|flatmap('ingredients')|map(attribute='amount_per_serving')|list
-            + recipe.passive_cooking|flatmap('ingredients')|map(attribute='amount_per_serving')|list)
-            |tojson|safe
-        }}
         format_num = function (num) {
             if (num == null) {
                 return ""
@@ -82,21 +74,22 @@
         }
 
         adjust_amounts = function (servings) {
-            let i = 0;
-            for (const element of document.getElementsByClassName("any-ingr-amount")) {
-                if (total_per_serving[i] == null) {
-                    element.innerText = "";
+            for (const element of document.getElementsByClassName("scalar")) {
+                per_serving = element.getElementsByClassName("scalar-per-serving")[0].innerText;
+
+                amount_elem = element.getElementsByClassName("scalar-amt")[0];
+                if (per_serving === "None") {
+                    amount_elem.innerText = "";
                 } else {
-                    element.innerText = format_num(total_per_serving[i] * servings);
+                    amount_elem.innerText = format_num(parseFloat(per_serving) * servings);
                 }
-                i += 1;
             }
         }
 
         increment_servings = function () {
             const servingsElem = document.getElementById("recipe-servings-amnt");
             let servings = parseFloat(servingsElem.innerText);
-            servings += {{ recipe.servings_increment|safe }};
+            servings += {{ recipe.metadata.servings_increment|safe }};
             servingsElem.innerText = format_num(servings);
             adjust_amounts(servings);
         }
@@ -104,8 +97,8 @@
         decrement_servings = function () {
             const servingsElem = document.getElementById("recipe-servings-amnt");
             let servings = parseFloat(servingsElem.innerText);
-            if (servings >= {{ recipe.servings_increment|safe }}) {
-                servings -= {{ recipe.servings_increment|safe }};
+            if (servings >= {{ recipe.metadata.servings_increment|safe }}) {
+                servings -= {{ recipe.metadata.servings_increment|safe }};
                 servingsElem.innerText = format_num(servings);
                 adjust_amounts(servings);
             }
@@ -113,17 +106,29 @@
     </script>
 
     <div id="recipe" itemscope itemtype="https://schema.org/Recipe">
-        <span id="recipe-title">{{ recipe.name }}</span>
+        <span id="recipe-title">{{ recipe.metadata.name }}</span>
 
-        {% for tag in recipe.tags %}
+        {% for tag in recipe.metadata.tags %}
             <meta itemprop="keywords" content="{{ tag }}"/>
         {% endfor %}
 
-        {% if recipe.note %}
-        <span id="recipe-note">
-            {{ recipe.note }}
+        <span id="recipe-frontmatter">
+            {% if recipe.metadata.note %}
+                <div class="recipe-note">{{ recipe.metadata.note }}</div>
+            {% endif %}
+            {% if recipe.metadata.related %}
+                <div class="recipe-related">
+                    Related recipes:
+                    {% for related in recipe.metadata.related %}
+                        {% if loop.index0 != 0 %}, {% endif %}
+                    	<a href="/{{ root }}/{{ active_lang }}/{{ related }}">{{ book.by_id[related].get_name(active_lange) }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if recipe.metadata.attribution %}
+                <div class="recipe-attribution">Based on <a href="{{ recipe.metadata.attribution }}">{{ recipe.metadata.attribution }}</a></div>
+            {% endif %}
         </span>
-        {% endif %}
 
         {% if recipe_trans.translations.keys()|length > 1 %}
         <span id="recipe-lang">
@@ -133,7 +138,7 @@
                 {% if lang == active_lang %}
                     {{ lang }}
                 {% else %}
-                    <a href="{{ root }}/{{ lang }}/recipe/{{ recipe.id }}">{{ lang }}</a>
+                    <a href="{{ root }}/{{ lang }}/recipe/{{ recipe.metadata.id }}">{{ lang }}</a>
                 {% endif %}
             {% endfor %}
         </span>
@@ -142,9 +147,9 @@
         <span id="recipe-servings" itemprop="recipeYield" itemscope itemtype="https://schema.org/QuantitativeValue">
             {{ localize("recipe.servingshint") }}
             <button onclick="decrement_servings()">-</button>
-            <span id="recipe-servings-amnt" itemprop="value">{{ recipe.serves }}</span>
+            <span id="recipe-servings-amnt" itemprop="value">{{ recipe.metadata.serves }}</span>
             <button onclick="increment_servings()">+</button>
-            {% if recipe.servings_unit %}<span itemprop="unitText">{{ recipe.servings_unit }}</span>{% endif %}
+            {% if recipe.servings_unit %}<span itemprop="unitText">{{ recipe.metadata.servings_unit }}</span>{% endif %}
         </span>
         <!--
         <div id="recipe-servings-and-lang">
@@ -156,45 +161,49 @@
             <span id="recipe-ingredients-heading">{{ localize("recipe.ingredients.heading") }}</span>
             <div id="recipe-ingredients">
                 {% for ingr in recipe.total_ingredients %}
-                    <span class="ingr-amount any-ingr-amount">{{ ingr.amount|format_num }}</span>
+                    <span class="ingr-amount scalar">
+                        <span class="scalar-amt">{{ ingr.amount|format_num }}</span>
+                        <span class="scalar-per-serving">{{ ingr.amount_per_serving }}</span>
+                    </span>
                     <span class="ingr-unit">{% if ingr.unit %}{{ ingr.unit }}{% endif %}</span>
                     <span class="ingr-name" itemprop="recipeIngredient">{{ ingr.ingredient }}</span>
                 {% endfor %}
             </div>
         </div>
 
-        {% macro section(id, sect) %}
-            {% if sect %}
-                <div class="recipe-section" id="{{ id }}">
-                    <span class="recipe-section-heading">{{ localize("recipe.section." + id + ".heading") }}</span>
-                    {% for step in sect %}
-                        <div class="step" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
-                            <div class="step-ingredients">
-                                {% for ingr in step.ingredients %}
-                                    <span class="step-ingr-hint">
-                                        <span class="any-ingr-amount">{{ ingr.amount|format_num }}</span> {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
-                                    </span>
-                                {% endfor %}
-                                {% for ingr in step.internal_ingredients %}
-                                    <span class="step-ingr-hint">
-                                        {{ ingr }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                            <div class="step-instructions" itemprop="text">
-                                {{ step.instructions }}
-                            </div>
+        {% macro section(sect) %}
+            <div class="recipe-section">
+                <span class="recipe-section-heading">{{ sect.heading or "" }}</span>
+                {% for step in sect.steps %}
+                    <div class="step" itemprop="step" itemscope itemtype="https://schema.org/HowToStep">
+                        <div class="step-ingredients">
+                            {% for ingr in step.ingredients %}
+                                <span class="step-ingr-hint">
+                                    <span class="scalar">
+                                        <span class="scalar-amt">{{ ingr.amount|format_num }}</span>
+                                        <span class="scalar-per-serving">{{ ingr.amount_per_serving }}</span>
+                                    </span> {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
+                                </span>
+                            {% endfor %}
+                            {% for ingr in step.internal_ingredients %}
+                                <span class="step-ingr-hint">
+                                    {{ ingr }}
+                                </span>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
+                        <div class="step-instructions" itemprop="text">
+                            {% for part in step.instructions %}
+                                {{ part|format_instr_part }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% endmacro %}
 
-        {{ section("prep", recipe.prep) }}
-        {{ section("misenplace", recipe.mis_en_place) }}
-        {{ section("cooking", recipe.cooking) }}
-        {{ section("passivecooking", recipe.passive_cooking) }}
-        {{ section("cooking2", recipe.cooking2) }}
-        {{ section("passivecooking2", recipe.passive_cooking2) }}
+
+        {% for sect in recipe.sections %}
+            {{ section(sect) }}
+        {% endfor %}
     </div>
 {% endblock %}

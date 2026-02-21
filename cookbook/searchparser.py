@@ -1,7 +1,7 @@
 import abc
 from typing import Optional, List, Callable
 
-from cookbook.cookbook import Recipe
+from .cookbook.cookbook import Recipe
 
 
 class Filter:

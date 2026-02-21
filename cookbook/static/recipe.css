@@ -13,7 +13,7 @@
         grid-row: 1;
     }
 
-    #recipe-note {
+    #recipe-frontmatter {
         font-style: italic;
         grid-row: 2;
     }
@@ -67,6 +67,11 @@
 
     .ingr-name {
         grid-column: ingr-name / span 1;
+    }
+
+    .scalar-per-serving {
+        display: none;
+        visibility: hidden;
     }
 
 
