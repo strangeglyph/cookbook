@@ -57,7 +57,6 @@ def round_up(num: float) -> int:
 
 
 def format_instr_part(value):
-    print("Formatting instr part ", value)
     from .cookbook.recipev2 import Scalar
     if type(value) == Scalar:
         return (f'<span class="scalar">'

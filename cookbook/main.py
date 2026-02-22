@@ -95,7 +95,7 @@ def search():
         if query.passes(recipe):
             results.add(recipe)
 
-    results = sorted(results, key=lambda r: r.name)
+    results = sorted(results, key=lambda r: r.metadata.name)
 
     g.response.data = flask.render_template('listing.jinja2', results=results, query=query_str)
     return g.response

@@ -65,7 +65,7 @@ class RecipeMeta:
                 return acc, line
 
     @staticmethod
-    def parse(file: TextIO, lang, id, filename) -> 'RecipeMeta':
+    def parse(file: TextIO, id, lang, filename) -> 'RecipeMeta':
         metadata = RecipeMeta()
         metadata.id = id
         metadata.lang = lang
@@ -129,14 +129,15 @@ class Ingredient:
     @staticmethod
     def parse(line: str, serves: float) -> 'Ingredient':
         parts = shlex.split(line)
+        if not parts:
+            raise LoadException(f"Can't parse ingredient '{line}': missing information")
+
         if len(parts) == 1:
             return Ingredient(serves, parts[0])
         elif len(parts) == 2:
             return Ingredient(serves, parts[1], float(parts[0]))
-        elif len(parts) == 3:
-            return Ingredient(serves, parts[2], float(parts[0]), parts[1])
         else:
-            raise LoadException(f"Too many fields in ingredient line '{line}'")
+            return Ingredient(serves, ' '.join(parts[2:]), float(parts[0]), parts[1])
 
 
 @dataclass
@@ -156,7 +157,7 @@ def split_instr(line: str, serves) -> List[InstrPart]:
         else:
             result.append(part)
 
-    return parts
+    return result
 
 @dataclass
 class RecipeStep:
@@ -272,7 +273,7 @@ class RecipeV2:
 
     @staticmethod
     def load(path: Path, id, lang, filename) -> "RecipeV2":
-        with open(path) as file:
+        with open(path, encoding='utf-8') as file:
             return RecipeV2.parse(file, id, lang, filename)
 
     @staticmethod
@@ -301,5 +302,10 @@ class RecipeV2:
                 file.seek(pos)
                 current_section_steps.append(RecipeStep.parse(file, meta.serves))
 
-        return RecipeV2()
+            pos = file.tell()
+            line = file.readline()
+
+        if current_section_steps:
+            sections.append(RecipeSection(current_section_steps, current_section_heading))
+        return RecipeV2(meta, sections)
 
