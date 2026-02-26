@@ -78,7 +78,6 @@ class Cookbook:
 
         return warnings
 
-
     def image_path(self, recipe) -> str:
         """
         Search for a matching image in the images/ subfolder of the recipe folder. Image name

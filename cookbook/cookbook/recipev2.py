@@ -132,12 +132,15 @@ class Ingredient:
         if not parts:
             raise LoadException(f"Can't parse ingredient '{line}': missing information")
 
-        if len(parts) == 1:
-            return Ingredient(serves, parts[0])
-        elif len(parts) == 2:
-            return Ingredient(serves, parts[1], float(parts[0]))
-        else:
-            return Ingredient(serves, ' '.join(parts[2:]), float(parts[0]), parts[1])
+        try:
+            if len(parts) == 1:
+                return Ingredient(serves, parts[0])
+            elif len(parts) == 2:
+                return Ingredient(serves, parts[1], float(parts[0]))
+            else:
+                return Ingredient(serves, ' '.join(parts[2:]), float(parts[0]), parts[1])
+        except ValueError:
+            raise LoadException(f"Can't parse amount of ingredient '{line}' (lexed as {parts})")
 
 
 @dataclass
@@ -273,8 +276,11 @@ class RecipeV2:
 
     @staticmethod
     def load(path: Path, id, lang, filename) -> "RecipeV2":
-        with open(path, encoding='utf-8') as file:
-            return RecipeV2.parse(file, id, lang, filename)
+        try:
+            with open(path, encoding='utf-8') as file:
+                return RecipeV2.parse(file, id, lang, filename)
+        except LoadException as e:
+            e.add_note(f'in recipe {id}.{lang}')
 
     @staticmethod
     def parse(file: TextIO, id, lang, filename) -> 'RecipeV2':
@@ -300,12 +306,18 @@ class RecipeV2:
                 current_section_steps = []
             else:
                 file.seek(pos)
-                current_section_steps.append(RecipeStep.parse(file, meta.serves))
+                try:
+                    current_section_steps.append(RecipeStep.parse(file, meta.serves))
+                except LoadException as e:
+                    e.add_note(f'In step #{len(current_section_steps) + 1} of section #{len(sections) + 1} ({current_section_heading if current_section_heading else "<untitled>"})')
 
             pos = file.tell()
             line = file.readline()
 
         if current_section_steps:
             sections.append(RecipeSection(current_section_steps, current_section_heading))
-        return RecipeV2(meta, sections)
+
+        recipe = RecipeV2(meta, sections)
+
+        return recipe
 
