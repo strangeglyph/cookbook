@@ -123,7 +123,7 @@ def recipe(recipe_id: str):
     elif app.config["DEFAULT_LANG"] in recipe_trans.translations:
         recipe = recipe_trans.translations[app.config["DEFAULT_LANG"]]
     else:
-        recipe = next(recipe_trans.translations.values())
+        recipe = list(recipe_trans.translations.values())[0]
 
     g.response.data = flask.render_template('recipe.jinja2', recipe=recipe, recipe_trans=recipe_trans)
     return g.response
