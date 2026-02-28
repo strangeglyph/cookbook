@@ -1,5 +1,6 @@
 import difflib
-from dataclasses import dataclass
+import itertools
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Union, Optional, Set, TextIO
 import shlex
@@ -104,7 +105,7 @@ class RecipeMeta:
             elif line.startswith("attrib "):
                 metadata.set_once('attribution', line[6:].strip())
             elif line.startswith("related "):
-                parts = map(lambda rel: normalize_id(rel), line[6:].split(","))
+                parts = map(lambda rel: normalize_id(rel), line[7:].split(","))
                 metadata.related.extend(parts)
             elif line.startswith("hide"):
                 metadata.set_once('hide_from_all', True)
@@ -170,6 +171,9 @@ class RecipeStep:
     internal_ingredients: List[str]
     hidden_ingredients: List[str]
     yields: List[str]
+    no_dep: bool = False
+    upstream: List["RecipeStep"] = field(default_factory=list)
+    downstream: List["RecipeStep"] = field(default_factory=list)
 
     def rows(self):
         return max(1, len(self.ingredients) + len(self.internal_ingredients))
@@ -181,22 +185,25 @@ class RecipeStep:
         hidden_ingredients: List[str] = []
         instructions: List[InstrPart] = []
         yields: List[str] = []
+        no_dep = False
 
         line = file.readline()
         while line.strip() != "":
             if line.startswith("- "):
                 ingredients.append(Ingredient.parse(line[2:], serves))
             elif line.startswith("= "):
-                internal_ingredients.append(line[2:])
+                internal_ingredients.append(line[2:].strip())
+            elif line.startswith("@nodep"):
+                no_dep = True
             elif line.startswith("@ "):
-                hidden_ingredients.append(line[2:])
+                hidden_ingredients.append(line[2:].strip())
             elif line.startswith("-> "):
-                yields.append(line[3:])
+                yields.append(line[3:].lower().strip())
             else:
-                instructions += split_instr(line, serves)
+                instructions += split_instr(line.strip(), serves)
             line = file.readline()
 
-        return RecipeStep(serves, instructions, ingredients, internal_ingredients, hidden_ingredients, yields)
+        return RecipeStep(serves, instructions, ingredients, internal_ingredients, hidden_ingredients, yields, no_dep)
 
 @dataclass
 class RecipeSection:
@@ -210,6 +217,7 @@ class RecipeV2:
                  sections: List[RecipeSection]):
         self.metadata = metadata
         self.sections = sections
+        self.root_steps = []
 
         self.word_bag: Set[str] = set()
 
@@ -273,14 +281,56 @@ class RecipeV2:
     def has_word_approx(self, wanted_word: str) -> bool:
         return self.has_word(wanted_word) or any(difflib.get_close_matches(wanted_word.lower(), self.word_bag, cutoff=0.8))
 
+    def build_dep_graph(self):
+        first = True
+        prev_step: RecipeStep = None
+        yields = dict()
+
+
+        for i, section in enumerate(self.sections):
+            for j, step in enumerate(section.steps):
+                if first:
+                    self.root_steps.append(step)
+                    if step.internal_ingredients or step.hidden_ingredients:
+                        raise LoadException(f"First step has internal dependencies ({step.internal_ingredients}, {step.hidden_ingredients}). Consider reordering the recipe.")
+                    first = False
+                elif step.no_dep:
+                    self.root_steps.append(step)
+                    if step.internal_ingredients or step.hidden_ingredients:
+                        raise LoadException(f"Step #{j+1} in section #{i+1} is marked as nodep but has internal dependencies.")
+                elif not (step.internal_ingredients or step.hidden_ingredients):
+                    prev_step.downstream.append(step)
+                    step.upstream.append(prev_step)
+                else:
+                    for dep_name in map(lambda s: s.lower(), itertools.chain(step.internal_ingredients, step.hidden_ingredients)):
+                        if dep_name not in yields:
+                            similar = difflib.get_close_matches(dep_name, yields.keys(), cutoff=0.8)
+                            error_msg = f"Step #{j + 1} in section #{i + 1} has internal dependency '{dep_name}' but no such yield exists."
+                            if similar:
+                                error_msg += f"\n  Potential misspellings: {similar}"
+                            raise LoadException(error_msg)
+                        yields[dep_name].downstream.append(step)
+                        step.upstream.append(yields[dep_name])
+                for _yield in step.yields:
+                    if _yield in yields:
+                        raise LoadException(f"Step #{j+1} in section #{i+1} redefines yield '{_yield}'.")
+                    yields[_yield] = step
+                prev_step = step
+
+        for (_yield, step) in yields.items():
+            found = False
+            for downstream in step.downstream:
+                for downstream_dep in map(lambda s: s.lower(), itertools.chain(downstream.internal_ingredients, downstream.hidden_ingredients)):
+                    if _yield == downstream_dep:
+                        found = True
+                        break
+            if not found:
+                raise LoadException(f"Yield {_yield} defined but never used")
 
     @staticmethod
     def load(path: Path, id, lang, filename) -> "RecipeV2":
-        try:
-            with open(path, encoding='utf-8') as file:
-                return RecipeV2.parse(file, id, lang, filename)
-        except LoadException as e:
-            e.add_note(f'in recipe {id}.{lang}')
+        with open(path, encoding='utf-8') as file:
+            return RecipeV2.parse(file, id, lang, filename)
 
     @staticmethod
     def parse(file: TextIO, id, lang, filename) -> 'RecipeV2':
@@ -310,6 +360,7 @@ class RecipeV2:
                     current_section_steps.append(RecipeStep.parse(file, meta.serves))
                 except LoadException as e:
                     e.add_note(f'In step #{len(current_section_steps) + 1} of section #{len(sections) + 1} ({current_section_heading if current_section_heading else "<untitled>"})')
+                    raise e
 
             pos = file.tell()
             line = file.readline()
@@ -318,6 +369,7 @@ class RecipeV2:
             sections.append(RecipeSection(current_section_steps, current_section_heading))
 
         recipe = RecipeV2(meta, sections)
+        recipe.build_dep_graph()
 
         return recipe
 

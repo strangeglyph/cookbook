@@ -146,7 +146,12 @@ class Cookbook:
                         book.tagcount_by_language[lang][tag] += 1
 
                 except LoadException as e:
+                    e.add_note(f"in recipe '{file}'")
                     errors.append(e)
+                except Exception as e:
+                    load_error = LoadException(e.args[0])
+                    load_error.add_note(f"in recipe '{file}'")
+                    errors.append(load_error)
 
         errors += book.validate_tags()
         errors += book.validate_related()

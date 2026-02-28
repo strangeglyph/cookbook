@@ -7,12 +7,12 @@ import os.path
 import sys
 import json
 
-
 from . import localization
 from . import formatting
 from . import searchparser
 from .common import get_data_path
 from .cookbook.cookbook import Cookbook
+from .cookbook.errors import LoadException
 
 
 app = Flask(__name__, template_folder=get_data_path("Templates"))
@@ -186,9 +186,13 @@ for language, collection in book.by_language.items():
     print(f"- {language}: {len(collection)}")
 
 if errors:
-    print("The following errors occurred while trying to load recipes (These recipes may be ignored):")
+    print("The following errors occurred while trying to load recipes (These recipes may be ignored):\n")
     for error in errors:
-        print(f"- {error.args[0]}")
+        print(f"{error.args[0]}")
+        if type(error) is LoadException:
+            for note in error.context:
+                print(f"  {note}")
+        print()
 
 if not book.by_id:
     print("I was unable to load any recipes whatsoever.")

@@ -71,7 +71,6 @@ class Parser:
         result = Query()
         next = self.word()
         while next:
-            print(f"scanned {next}, peek: {self.peek()}")
             if next.lower() == "tag" and self.peek() == ':':
                 self.char()  # skip ':'
                 search_term = self.word()

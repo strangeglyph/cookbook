@@ -2,6 +2,7 @@ import difflib
 import os
 from typing import List, Dict, Union, Optional, Set
 from ruamel.yaml import YAML, yaml_object
+from ruamel.yaml.comments import CommentedSeq
 
 from cookbook.localization import localize
 
@@ -58,10 +59,13 @@ class RecipeStep:
 
         self.yields: List[str] = []
         if yields is not None:
-            if type(yields) == list:
-                self.yields = yields
+            if type(yields) == str:
+                self.yields = [yields.lower()]
+            elif type(yields) == CommentedSeq:
+                self.yields = list(map(lambda s: s.lower(), yields))
             else:
-                self.yields = [yields]
+                raise LoadException(f"Unexpected type for yields: {type(yields)}")
+
 
     def rows(self):
         return max(1, len(self.ingredients) + len(self.internal_ingredients))
@@ -170,7 +174,10 @@ class RecipeV1:
         transfer_section(localize("recipe.section.cooking2.heading", self.lang), self.cooking2)
         transfer_section(localize("recipe.section.passivecooking2.heading", self.lang), self.passive_cooking2)
 
-        return RecipeV2(metadata, sections)
+        recipe = RecipeV2(metadata, sections)
+        recipe.build_dep_graph()
+
+        return recipe
 
     def normalize_id(self, id):
         return id.lower().replace(' ', '-')
