@@ -118,15 +118,15 @@
             {% endif %}
             {% if recipe.metadata.related %}
                 <div class="recipe-related">
-                    Related recipes:
+                    {{ localize("recipe.related") }}
                     {% for related in recipe.metadata.related %}
                         {% if loop.index0 != 0 %}, {% endif %}
-                    	<a href="/{{ root }}/{{ active_lang }}/{{ related }}">{{ book.by_id[related].get_name(active_lange) }}</a>
+                    	<a href="{{ root }}/{{ active_lang }}/recipe/{{ related }}">{{ book.by_id[related].get_name(active_lang) }}</a>
                     {% endfor %}
                 </div>
             {% endif %}
             {% if recipe.metadata.attribution %}
-                <div class="recipe-attribution">Based on <a href="{{ recipe.metadata.attribution }}">{{ recipe.metadata.attribution }}</a></div>
+                <div class="recipe-attribution">{{ localize("recipe.attribution") }}<a href="{{ recipe.metadata.attribution }}">{{ recipe.metadata.attribution }}</a></div>
             {% endif %}
         </span>
 

@@ -1,3 +1,5 @@
+recipe.related: "Related recipes:"
+recipe.attribution: "Based on:"
 recipe.ingredients.heading: Ingredients
 recipe.section.prep.heading: Prep
 recipe.section.misenplace.heading: Mis-En-Place
