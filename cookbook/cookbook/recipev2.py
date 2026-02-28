@@ -18,7 +18,7 @@ class RecipeMeta:
         self.lang: str = None
         self.name: str = None
         self.filename: str = None
-        self.serves: int = None
+        self.serves: int = 1
         self.servings_unit: Optional[str] = None
         self.servings_increment: Union[float, int] = 1
         self.desc: Optional[str] = None

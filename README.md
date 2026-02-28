@@ -196,10 +196,14 @@ for some hints.
 Recipes are stored in yaml files. These files should all be stored in one folder, 
 which should be provided to the cookbook service in the config file (`COOKBOOK_LOCATION`).
 
-The file names should follow the following format: `<id>.<language>.yml` or 
-`<id>.<language>.yaml`. The cookbook service will automatically aggregate recipes
+The file names should follow the following format: `<id>.<language>.<ending>`. 
+The cookbook service will automatically aggregate recipes
 with the same id but different language codes, see 'Localization' for more 
 information.
+
+The following formats are supported:
+- `.recipe` for Recipe Schema V2
+- `.yml` or `.yaml` for Recipe Schema V1
 
 #### A Note on Recipe Ids
 Recipe ids exist in two variants: Unnormalized, as found in the file name, and
@@ -229,7 +233,141 @@ Therefore, images should be cropped to a 16:9 aspect ratio (the search listing
 scales the images to 250 x 141px) [n.b. subject to change].
 
 
-## <a name="ref-format"></a> Recipe File Format
+## <a name="ref-format-v2"></a> Recipe Schema v2 Format
+
+The v2 schema is a freeform format designed to make writing recipes more 
+convenient than the v1 format. A recipe consists of a metadata section and 
+an arbitrary number of arbitrarily named recipe sections.
+
+### <a name="ref-format-v2-meta"></a> Metadata Section
+
+The metadata section is a sequence of lines that start with the following keywords:
+- `name` (mandatory) - The name of the recipe. Examples:
+  - `name Chocolate Cake`
+- `serves` (optional) - Servings information, in the format `<default number of servings> <servings unit> <servings increment>`. 
+  All values are optional but must be specified in left to right order. Default is a default
+  serving of 1, no specified unit, and an increment of 1.
+  Examples:
+  - `serves 8`
+  - `serves 1 cake`
+  - `serves 24 tartelettes 8` (when the user presses the increment button,
+     the recipe will be scaled for 32, then 40, and so on, tartelettes)
+- `desc` (optional) - A recipe description to display in the search overview. Multiline 
+  descriptions are supported by prefixing each subsequent line with two spaces.
+- `note` (optional) - A note to display on the recipe itself, for example for serving 
+  suggestions. Multiline descriptions are supported by prefixing each subsequent line 
+  with two spaces.
+- `tags` (optional) - A comma separated list of tags. Examples
+  - `tags cake`
+  - `tags main, vegan, my favorites`
+- `attrib` (optional) - Attribution and provenance information
+- `related` (optional) - A comma separated list of recipe ids to link from the recipe 
+  view. Examples:
+  - `related Chocolate Pecan Cake, White Chocolate Cake`
+- `hide` (optional, default false) - If present as a keyword, hides the recipe
+  from the all-recipes listing. Useful in combination with `related` for splitting 
+  out recipe variations without cluttering the main recipe listing. Specific 
+  searches will still turn up the recipe.
+- `version` (optional, default 2) - Recipe schema version. Currently unused and 
+  only supported for future proofing. If present, must be 2.
+
+An empty line terminates the metadata section.
+
+#### Example metadata section:
+```
+name Egg Tartelettes with Raisins
+serves 24 tartelettes 8
+desc A raisin variant of the classic egg tartelettes.
+note Soak the raisins in rum for a boozy variation.
+tags sweet, cake, dessert, snack
+attrib My Grandma
+related Egg Tartelettes
+hide
+```
+
+### <a name="ref-format-v2-section"></a> Recipe Section
+
+A recipe section is a sequence of logically-related instructions, for example 
+"Prep Ahead", "Mis-en-Place" or "For the Filling". A section starts with its title,
+for example `# Mis-en-Place`. It is then followed by a number of steps (described 
+below), each delimited with an empty line. A new section heading ends the current
+section and begins a new one.
+
+A step consists of ingredients required at this step, inputs from previous steps,
+outputs for subsequent steps and the actual instructions, in the following format:
+
+- A line beginning with `- ` is an ingredient. Depending on the number of words in 
+  the line, this has the following meaning:
+  - Just one word: An ingredient without a specific amount of unit. For example `- salt`
+  - Two words: An ingredient in a specified amount, without unit. For example `- 2 eggs`
+  - Three or more words: An ingredient with a specified amount and unit. For example `- 50 ml white wine`
+  - If the default splitting behavior does not work for a multi-word ingredient, you can wrap it in quotes. For example `- "orange juice"`
+- A line beginning with `-> ` is an output of a step, for use in subsequent steps. This can be listed multiple times for multiple outputs, for example 
+  ```
+  - 2 eggs
+  -> egg whites
+  -> egg yolks
+  ```
+- A line beginning with `= ` is an *internal ingredient*, that is, an input from a previous step.
+  Internal ingredients are free-form strings, but they must match an output of a previous step.
+- A line beginning with `@ ` is a *hidden ingredient*. These function like internal ingredients 
+  but are not displayed in the recipe view. Their purpose is for semantic linking of recipe steps.
+- Any other line is treated as part of the instructions. Inside the instructions you may wrap a 
+  number in braces (`{}`) to have it scale with the serving amount. For example:
+  `Zest {1} orange, then juice all of them.`
+
+#### Hidden ingredients? Internal ingredients? Semantic linking?
+For purposes of building a graph view of the recipe steps, the parser builds a 
+web of dependencies between the individual steps as follows:
+
+- The first step does not depend on any other step.
+- A step with internal or hidden ingredients depends on the steps that produce
+  the corresponding outputs.
+- A step with no internal or hidden ingredients implicitly depends on the 
+  preceeding step. This behavior can be overwritten with the special line
+  `@nodep`, which causes the step to be a root step like the first one.
+
+When writing recipes, you can use the following as a rule of thumb:
+
+- If a step only depends on the previous step and this linking is clear from
+  context, do not specify a dependency.
+- If a step depends on more than one previous step, on a distantly removed step,
+  or if the implicit linking might cause confusion, explicitly list the dependencies
+  as internal or hidden ingredients. Use internal ingredients for more distant steps
+  and major intermediate products and hidden ingredients for closer steps and
+  minor intermediate products.
+
+#### Example
+
+The following is an (imaginary, untested!) section for orange custard
+```
+# For the custard
+- 2 eggs
+-> egg yolks
+Split the eggs. Discard the whites.
+
+- 2 oranges
+- 100 g sugar
+- "vanilla extract"
+-> orange zest
+-> orange syrup
+Zest {1} orange and juice all of them. Bring the orange juice to a boil and stir
+in the sugar and the vanilla extract until dissolved.
+
+= egg yolks
+@ orange zest
+@ orange syrup
+-> custard
+In a bain-marie, whip eggs until foamy and just starting to set. Stir in 
+the orange syrup and the orange zest and continue whipping until you get
+a thick foam. Remove from heat and let cool.
+```
+
+
+## <a name="ref-format-v1"></a> Recipe Schema v1 Format
+Note: Unless you plan to process recipes further with other tools, it is not
+recommended to choose this format.
+
 ### <a name="ref-toplevel"></a> Top-Level Keys
 
 | Key                  | Description                                                                                                                                                                                                                                                       | Default | Mandatory? |
