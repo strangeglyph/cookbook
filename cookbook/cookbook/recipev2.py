@@ -17,7 +17,7 @@ class RecipeMeta:
         self.id: str = None
         self.lang: str = None
         self.name: str = None
-        self.filename: str = None
+        self.raw_id: str = None
         self.serves: int = 1
         self.servings_unit: Optional[str] = None
         self.servings_increment: Union[float, int] = 1
@@ -46,7 +46,7 @@ class RecipeMeta:
             raise LoadException(f"Recipe {self.name}: id is required")
         if self.lang is None:
             raise LoadException(f"Recipe {self.id}: language is required")
-        if self.filename is None:
+        if self.raw_id is None:
             raise LoadException(f"Recipe {self.id}.{self.lang}: filename is required")
         if self.name is None:
             raise LoadException(f"Recipe {self.id}.{self.lang} name is required")
@@ -66,11 +66,11 @@ class RecipeMeta:
                 return acc, line
 
     @staticmethod
-    def parse(file: TextIO, id, lang, filename) -> 'RecipeMeta':
+    def parse(file: TextIO, id, lang, raw_id) -> 'RecipeMeta':
         metadata = RecipeMeta()
         metadata.id = id
         metadata.lang = lang
-        metadata.filename = filename
+        metadata.raw_id = raw_id
 
         line = file.readline()
 
@@ -328,13 +328,13 @@ class RecipeV2:
                 raise LoadException(f"Yield {_yield} defined but never used")
 
     @staticmethod
-    def load(path: Path, id, lang, filename) -> "RecipeV2":
+    def load(path: Path, id, lang, raw_id) -> "RecipeV2":
         with open(path, encoding='utf-8') as file:
-            return RecipeV2.parse(file, id, lang, filename)
+            return RecipeV2.parse(file, id, lang, raw_id)
 
     @staticmethod
-    def parse(file: TextIO, id, lang, filename) -> 'RecipeV2':
-        meta = RecipeMeta.parse(file, id, lang, filename)
+    def parse(file: TextIO, id, lang, raw_id) -> 'RecipeV2':
+        meta = RecipeMeta.parse(file, id, lang, raw_id)
 
         sections = []
 

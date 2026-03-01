@@ -277,12 +277,12 @@ class RecipeV1:
         return recipe_id, lang
 
     @staticmethod
-    def load(path: str, id, lang, filename) -> "RecipeV1":
+    def load(path: str, _id, lang, raw_id) -> "RecipeV1":
 
         recipe_folder, _ = os.path.split(path)
         try:
             with open(path, 'r', encoding="utf-8") as f:
-                recipe = RecipeV1(recipe_folder, id, lang, **yaml.load(f))
+                recipe = RecipeV1(recipe_folder, raw_id, lang, **yaml.load(f))
                 return recipe
         except TypeError as e:
             if e.args and 'required positional argument' in e.args[0]:

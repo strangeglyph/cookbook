@@ -46,17 +46,19 @@ class Cookbook:
                     tag_set[lang].add(tag)
 
             for tag in tag_set[lang]:
-                similar = difflib.get_close_matches(tag, tag_set[lang], cutoff=0.8)
+                similar = difflib.get_close_matches(tag, tag_set[lang], cutoff=0.84)
                 similar.remove(tag)
                 if similar:
                     def recipe_list(other_tag):
-                        return ', '.join(map(lambda r: r.metadata.id, self.by_language[lang][other_tag]))
+                        return ', '.join(map(lambda r: r.metadata.id, self.by_lang_and_tag[lang][other_tag]))
+
                     def other_tag_list(tags):
                         return "\n".join(map(lambda t: f'    - {t} in {recipe_list(t)}', tags))
-                    warnings.append(f"Tag '{tag}' of language {lang} potentially misspelled.\n"
-                                    f"  Tag present in files: {recipe_list(tag)}\n"
-                                    f"  Candidate tags:\n"
-                                    f"{other_tag_list(similar)}")
+
+                    warnings.append(LoadException(f"Tag '{tag}' of language {lang} potentially misspelled.\n"
+                                                  f"  Tag present in files: {recipe_list(tag)}\n"
+                                                  f"  Candidate tags:\n"
+                                                  f"{other_tag_list(similar)}"))
 
         return warnings
 
@@ -84,10 +86,10 @@ class Cookbook:
         should be either the same as the recipe file name or in slug format (all lower case and spaces
         replaced with dashes)
         """
-        if os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.filename}.png")):
-            return f"images/{recipe.metadata.filename}.png"
-        elif os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.filename}.jpg")):
-            return f"images/{recipe.metadata.filename}.jpg"
+        if os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.raw_id}.png")):
+            return f"images/{recipe.metadata.raw_id}.png"
+        elif os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.raw_id}.jpg")):
+            return f"images/{recipe.metadata.raw_id}.jpg"
         elif os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.id}.png")):
             return f"images/{recipe.metadata.id}.png"
         elif os.path.exists(os.path.join(self.folder, "images", f"{recipe.metadata.id}.jpg")):
@@ -121,7 +123,7 @@ class Cookbook:
                     lang = lang[1:]
                     fpath = ospath.join(root, file)
 
-                    recipe = extension_map[extension].load(fpath, id, lang, fname)
+                    recipe = extension_map[extension].load(fpath, id, lang, raw_id)
 
                     if type(recipe) is RecipeV1:
                         recipe = recipe.to_v2()
