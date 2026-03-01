@@ -192,6 +192,8 @@ if errors:
         if type(error) is LoadException:
             for note in error.context:
                 print(f"  {note}")
+            if error.cause:
+                raise error.cause
         print()
 
 if not book.by_id:

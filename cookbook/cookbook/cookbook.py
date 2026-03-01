@@ -152,6 +152,7 @@ class Cookbook:
                     errors.append(e)
                 except Exception as e:
                     load_error = LoadException(e.args[0])
+                    load_error.add_cause(e)
                     load_error.add_note(f"in recipe '{file}'")
                     errors.append(load_error)
 

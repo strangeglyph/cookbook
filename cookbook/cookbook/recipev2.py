@@ -153,9 +153,9 @@ InstrPart = Union[str, Scalar]
 
 def split_instr(line: str, serves) -> List[InstrPart]:
     result = []
-    parts = line.split(' ')
+    parts = line.split()
     for part in parts:
-        if part[0] == '{' and part[-1] == '}':
+        if part and part[0] == '{' and part[-1] == '}':
             amt = float(part[1:-1])
             result.append(Scalar(amt, amt / serves))
         else:
