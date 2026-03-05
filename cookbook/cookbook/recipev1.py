@@ -146,6 +146,7 @@ class RecipeV1:
     def to_v2(self) -> RecipeV2:
         metadata = RecipeMeta()
         metadata.id = self.id
+        metadata.raw_id = self.unformatted_id
         metadata.lang = self.lang
         metadata.name = self.name
         metadata.serves = self.serves
