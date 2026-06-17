@@ -1,20 +1,43 @@
-[tool.poetry]
+[project]
 name = "cookbook"
 version = "0.1.0"
 description = "Flask application to serve recipes"
-authors = ["glyph <mail at strangegly dot ph>"]
+authors = [{ name = "glyph", email = "mail at strangegly dot ph" }]
+requires-python = ">=3.11,<4"
 readme = "README.md"
-packages = [{include = "cookbook"}]
 license = "MIT"
-repository = "https://github.com/strangeglyph/cookbook"
-keywords = ["cooking", "recipes", "cookbook"]
-include = ["cookbook/localization/*", "cookbook/static/*", "cookbook/Templates/*"]
+keywords = [
+    "cooking",
+    "recipes",
+    "cookbook",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "flask>=3.1,<4",
+    "ruamel.yaml>=0.19,<0.20",
+    "uv-build>=0.10.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-flask = "^3.1"
-"ruamel.yaml" = "^0.19"
+[project.urls]
+Repository = "https://github.com/strangeglyph/cookbook"
+
+[tool.uv]
+
+[tool.uv.build-backend]
+module-name = ["cookbook"]
+module-root = ""
+source-include = [
+    "cookbook/localization/*",
+    "cookbook/static/*",
+    "cookbook/Templates/*",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.10,<0.11.0"]
+build-backend = "uv_build"
