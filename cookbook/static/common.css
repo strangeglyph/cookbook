@@ -5,6 +5,9 @@ body {
     display: flex;
     flex-flow: column;
     justify-content: center;
+
+    background-color: #eaeffa;
+    color: #1a1f2a
 }
 
 #content {
