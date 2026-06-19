@@ -163,7 +163,7 @@
                 {% for ingr in recipe.total_ingredients %}
                     <span class="ingr-amount scalar">
                         <span class="scalar-amt">{{ ingr.amount|format_num }}</span>
-                        <hidden class="scalar-per-serving">{{ ingr.amount_per_serving }}</hidden>
+                        <span hidden class="scalar-per-serving">{{ ingr.amount_per_serving }}</span>
                     </span>
                     <span class="ingr-unit">{% if ingr.unit %}{{ ingr.unit }}{% endif %}</span>
                     <span class="ingr-name" itemprop="recipeIngredient">{{ ingr.ingredient }}</span>
@@ -181,7 +181,7 @@
                                 <span class="step-ingr-hint">
                                     <span class="scalar">
                                         <span class="scalar-amt">{{ ingr.amount|format_num }}</span>
-                                        <hidden class="scalar-per-serving">{{ ingr.amount_per_serving }}</hidden>
+                                        <span hidden class="scalar-per-serving">{{ ingr.amount_per_serving }}</span>
                                     </span> {% if ingr.unit %}{{ ingr.unit }}{% endif %} {{ ingr.ingredient }}
                                 </span>
                             {% endfor %}

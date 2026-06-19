@@ -196,6 +196,10 @@
         justify-self: center;
     }
 
+    .scalar-per-serving {
+        display: none;
+    }
+
     .ingr-amount {
         grid-column: ingr-amnt / span 1;
         text-align: right;
